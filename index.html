@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mundo Vivo</title>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#87b96b;
+}
+
+#info{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:10;
+    background:rgba(15,25,35,.9);
+    color:white;
+    padding:15px;
+    border-radius:15px;
+}
+
+#info h1{
+    margin:0 0 8px;
+    font-size:22px;
+}
+
+#info p{
+    margin:4px 0;
+    font-size:14px;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+
+<body>
+
+<div id="info">
+<h1>🌎 MUNDO VIVO</h1>
+<p>👥 Habitantes: <span id="population">100</span></p>
+<p>📅 Día: <span id="day">1</span></p>
+<p>💰 Economía: Activa</p>
+<p>🧠 IA: Simulando vidas</p>
+</div>
+
+<canvas id="world"></canvas>
+
+<script>
+
+const canvas=document.getElementById("world");
+const ctx=canvas.getContext("2d");
+
+let width;
+let height;
+
+function resize(){
+    width=canvas.width=window.innerWidth;
+    height=canvas.height=window.innerHeight;
+}
+
+window.addEventListener("resize",resize);
+resize();
+
+const names=[
+"Ana","Luis","Sofía","Carlos","Elena",
+"Mateo","Diego","Valeria","Jorge","Lucía",
+"Pablo","María","Daniel","Camila","Miguel",
+"Sara","Leo","Emma"
+];
+
+const jobs=[
+"Agricultor",
+"Constructor",
+"Comerciante",
+"Médico",
+"Artesano",
+"Maestro"
+];
+
+let people=[];
+
+for(let i=0;i<100;i++){
+
+    people.push({
+
+        name:names[Math.floor(Math.random()*names.length)]+" "+(i+1),
+
+        age:18+Math.floor(Math.random()*45),
+
+        job:jobs[Math.floor(Math.random()*jobs.length)],
+
+        x:Math.random()*width,
+
+        y:100+Math.random()*(height-220),
+
+        dx:(Math.random()-.5),
+
+        dy:(Math.random()-.5)
+
+    });
+
+}
+
+let day=1;
+
+function draw(){
+
+    ctx.clearRect(0,0,width,height);
+
+    /* Tierra */
+
+    ctx.fillStyle="#78a968";
+    ctx.fillRect(0,0,width,height);
+
+    /* Agua */
+
+    ctx.fillStyle="#4d9bc2";
+    ctx.fillRect(0,height-100,width,100);
+
+    /* Caminos */
+
+    ctx.fillStyle="#c9b88b";
+
+    ctx.fillRect(0,height/2-20,width,40);
+
+    ctx.fillRect(width/2-20,80,40,height-180);
+
+    /* Casas */
+
+    ctx.font="40px Arial";
+
+    ctx.fillText("🏠",width/2-120,180);
+    ctx.fillText("🏠",width/2+80,230);
+    ctx.fillText("🏪",width/2+150,150);
+    ctx.fillText("🏥",width/2-220,250);
+    ctx.fillText("🏫",width/2+20,320);
+    ctx.fillText("🌾",120,300);
+
+    /* Habitantes */
+
+    people.forEach(person=>{
+
+        person.x+=person.dx;
+        person.y+=person.dy;
+
+        if(person.x<20 || person.x>width-20)
+            person.dx*=-1;
+
+        if(person.y<80 || person.y>height-130)
+            person.dy*=-1;
+
+        ctx.beginPath();
+
+        ctx.fillStyle="#f4c28a";
+
+        ctx.arc(
+            person.x,
+            person.y,
+            7,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(draw);
+}
+
+setInterval(()=>{
+
+    day++;
+
+    document.getElementById("day").textContent=day;
+
+    people.forEach(person=>{
+
+        person.age+=1/365;
+
+    });
+
+},5000);
+
+canvas.addEventListener("click",function(event){
+
+    const x=event.clientX;
+    const y=event.clientY;
+
+    let closest=null;
+    let distance=Infinity;
+
+    people.forEach(person=>{
+
+        const d=Math.hypot(
+            person.x-x,
+            person.y-y
+        );
+
+        if(d<distance){
+
+            distance=d;
+            closest=person;
+
+        }
+
+    });
+
+    if(closest && distance<40){
+
+        alert(
+            "👤 "+closest.name+
+            "\n\nEdad: "+Math.floor(closest.age)+
+            "\nProfesión: "+closest.job+
+            "\n\nEste habitante está viviendo su propia vida."
+        );
+
+    }
+
+});
+
+draw();
+
+</script>
+
+</body>
+</html>
