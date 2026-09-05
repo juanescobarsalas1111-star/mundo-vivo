@@ -1,14 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+(function(){
+  window.__mundoVivoReady = false;
+  window.hideMundoLoader = function(){
+    if(window.__mundoVivoReady) return;
+    window.__mundoVivoReady = true;
+    var el = document.getElementById('loading');
+    if(el){
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      setTimeout(function(){ if(el && el.parentNode) el.parentNode.removeChild(el); }, 450);
+    }
+  };
+  window.addEventListener('error', function(e){
+    console.warn('Mundo Vivo V15.1: error de inicio', e.error || e.message);
+    setTimeout(window.hideMundoLoader, 800);
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    console.warn('Mundo Vivo V15.1: promesa rechazada', e.reason);
+    setTimeout(window.hideMundoLoader, 800);
+  });
+  setTimeout(window.hideMundoLoader, 12000);
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Mundo Vivo 15 • Mundo real • IA</title>
+<title>Mundo Vivo 15.1 • Mundo real • IA</title>
 <meta name="theme-color" content="#071018">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mundo Vivo">
 <link rel="manifest" href="manifest.webmanifest">
+
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071018;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -28,6 +54,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071018;fon
 #buttons{position:absolute;right:18px;bottom:max(30px,env(safe-area-inset-bottom));display:flex;gap:9px;pointer-events:auto;align-items:flex-end}
 .act{width:74px;height:74px;border-radius:50%;border:1px solid #ffffff38;background:#17212bd9;color:#fff;font-weight:950;font-size:10px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #0004}
 .act.on{background:#2f9e63}
+
 #panel,#mapPanel,#dialog,#quest,#spawnPanel{position:fixed;z-index:30;background:rgba(7,16,24,.96);color:#fff;border:1px solid #ffffff28;border-radius:18px;backdrop-filter:blur(18px);display:none;box-shadow:0 18px 55px #0008}
 #panel.open,#mapPanel.open,#spawnPanel.open{display:block}
 #panel{right:12px;top:68px;width:min(320px,calc(100vw - 24px));padding:16px;max-height:76vh;overflow:auto}
@@ -49,6 +76,7 @@ select{padding:9px;border-radius:10px;background:#17232d;color:#fff;border:1px s
 .toggle{display:flex;gap:8px;align-items:center;font-size:12px}
 .spawnGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .spawnBtn{border:1px solid #ffffff20;background:#ffffff10;color:#fff;border-radius:12px;padding:12px 8px;font-weight:800;font-size:11px}
+
 #loading{position:fixed;inset:0;z-index:50;background:#08111a;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center}
 .loadingHide{display:none!important}
 .spinner{width:42px;height:42px;border:4px solid #ffffff20;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
@@ -71,8 +99,10 @@ select{padding:9px;border-radius:10px;background:#17232d;color:#fff;border:1px s
 #chatForm{display:flex;gap:7px;padding:10px;border-top:1px solid #ffffff18}
 #chatInput{flex:1;min-width:0;border:1px solid #ffffff20;border-radius:12px;background:#fff;color:#111;padding:11px;font-size:12px;touch-action:auto}
 #sendChat{border:0;border-radius:12px;background:#2f9e63;color:#fff;padding:0 14px;font-weight:900}
+
 #appPanel{right:12px;top:68px;width:min(330px,calc(100vw - 24px));padding:16px;flex-direction:column;gap:10px}
 .installBtn{border:1px solid #ffffff22;background:#ffffff12;color:#fff;border-radius:12px;padding:12px;font-weight:850;text-align:left}
+
 #helpRequest{left:50%;bottom:calc(max(30px,env(safe-area-inset-bottom)) + 125px);transform:translateX(-50%);width:min(430px,calc(100vw - 28px));padding:14px;flex-direction:column}
 .helpTitle{font-weight:950;font-size:16px}
 .helpNeed{margin-top:5px;font-size:12px;line-height:1.4}
@@ -82,433 +112,2139 @@ select{padding:9px;border-radius:10px;background:#17232d;color:#fff;border:1px s
 .realism{font-size:10px;opacity:.7;line-height:1.35;margin-top:6px}
 #aiState{font-weight:700}
 </style>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    if(!window.__mundoVivoReady){
+      var el=document.getElementById('loading');
+      if(el){
+        var t=el.querySelector('h1');
+        var s=el.querySelector('p');
+        if(t) t.textContent='Mundo Vivo V15.1';
+        if(s) s.textContent='Iniciando el mundo…';
+      }
+    }
+  }, 2500);
+});
+</script>
 </head>
+
 <body>
+
 <canvas id="game"></canvas>
 
 <div id="loading">
-<div>
-<div class="spinner"></div>
-<b id="loadText">Cargando Mundo Vivo V15…</b>
-<div style="font-size:11px;opacity:.6;margin-top:7px">
-Vegetación • montañas • casas • animales • vehículos • agua • NPC
-</div>
-</div>
-</div>
-
-<div id="hud">
-<div id="top">
-<div class="box">
-<div id="name">🌎 MUNDO VIVO <span style="opacity:.5">V15 • IA</span></div>
-<div id="status">Exploración • 360° • Día • A pie</div>
-</div>
-
-<div id="topRight">
-<button class="topbtn" id="mapBtn">🗺️</button>
-<button class="topbtn" id="spawnBtn">🏗️</button>
-<button class="topbtn" id="chatBtn">💬</button>
-<button class="topbtn" id="appBtn">📲</button>
-<button class="topbtn" id="gear">⚙️</button>
-</div>
-</div>
-
-<div id="help" class="box">
-Arrastra para mirar • Joystick para caminar • Toca personas y casas
-</div>
-
-<div id="compass">N 0°</div>
-<div id="look"></div>
-<div id="cross"></div>
-<div id="joy"><div id="stick"></div></div>
-
-<div id="buttons">
-<button class="act" id="jump">SALTAR</button>
-<button class="act" id="fly">VOLAR</button>
-<button class="act" id="run">CORRER</button>
-</div>
-</div>
-
-<div id="panel">
-<b style="font-size:18px">⚙️ Configuración</b>
-
-<div class="row">
-<label>Tamaño controles <b id="sv">100%</b></label>
-<input id="size" type="range" min="70" max="140" value="100">
-</div>
-
-<div class="row">
-<label>Sensibilidad cámara <b id="cv">100%</b></label>
-<input id="sens" type="range" min="40" max="200" value="100">
-</div>
-
-<div class="row">
-<label>Gráficos</label>
-<select id="quality">
-<option value="1">Ultra</option>
-<option value=".8">Alta</option>
-<option value=".65">Media</option>
-<option value=".5">Ahorro</option>
-</select>
-</div>
-
-<div class="row">
-<label>Hora <b id="tv">12:00</b></label>
-<input id="time" type="range" min="0" max="24" value="12" step=".25">
-</div>
-
-<div class="row toggle">
-<input id="sound" type="checkbox" checked> Sonidos del mundo
-</div>
-
-<div class="row toggle">
-<input id="names" type="checkbox" checked> Nombres de personajes
-</div>
-
-<div class="row toggle">
-<input id="shadows" type="checkbox" checked> Sombras dinámicas
-</div>
-
-<div class="small">
-El mundo funciona en el navegador. El audio se activa después de tocar la pantalla. El modo vuelo permite subir, bajar y desplazarte.
-</div>
-</div>
-
-<div id="mapPanel">
-<b>🗺️ Mapa del mundo</b>
-<canvas id="map"></canvas>
-<div id="mapHint">
-Toca cualquier punto para teletransportarte. Los puntos rojos son edificios y los amarillos habitantes.
-</div>
-</div>
-
-<div id="spawnPanel">
-<div style="font-weight:950;font-size:17px">🏗️ Crear en el mundo</div>
-<div class="small" style="margin-top:5px">
-Toca un botón y aparecerá cerca de ti.
-</div>
-
-<div class="spawnGrid">
-<button class="spawnBtn" data-spawn="house">🏠 Casa</button>
-<button class="spawnBtn" data-spawn="building">🏢 Edificio</button>
-<button class="spawnBtn" data-spawn="tree">🌳 Árbol</button>
-<button class="spawnBtn" data-spawn="animal">🐕 Animal</button>
-<button class="spawnBtn" data-spawn="car">🚗 Vehículo</button>
-<button class="spawnBtn" data-spawn="npc">🧑 Persona</button>
-<button class="spawnBtn" data-spawn="lake">🌊 Agua</button>
-<button class="spawnBtn" data-spawn="bird">🐦 Aves</button>
-</div>
-</div>
-
-<div id="dialog">
-<div id="dialogName">Personaje</div>
-<div class="dialogText" id="dialogText"></div>
-
-<div class="dialogActions">
-<button class="dBtn" id="helpBtn">🤝 AYUDAR</button>
-<button class="dBtn" id="followBtn">🧭 IR CONMIGO</button>
-<button class="dBtn" id="closeDialog">CERRAR</button>
-</div>
-
-<div class="small" id="dialogAction" style="margin-top:8px"></div>
-</div>
-
-<div id="quest">
-<div id="questTitle">📌 Situación del mundo</div>
-<div class="small" id="questText">
-Explora, escucha a los habitantes y ayúdalos según lo que esté ocurriendo.
-</div>
-</div>
-
-<div id="helpRequest">
-<div class="helpTitle">🆘 Petición de ayuda</div>
-<div class="helpNeed" id="helpNeed">
-Un habitante necesita tu ayuda.
-</div>
-
-<div class="helpActions">
-<button class="accept" id="acceptHelp">✅ ACEPTAR</button>
-<button id="declineHelp">❌ RECHAZAR</button>
-</div>
-</div><!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Mundo Vivo 15 • Mundo real • IA</title>
-<meta name="theme-color" content="#071018">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Mundo Vivo">
-<link rel="manifest" href="manifest.webmanifest">
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#071018;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
-#game{position:fixed;inset:0;width:100%;height:100%}
-#hud{position:fixed;inset:0;color:#fff;pointer-events:none}
-.box{background:rgba(7,16,24,.78);border:1px solid rgba(255,255,255,.16);border-radius:17px;padding:10px 13px;backdrop-filter:blur(14px)}
-#top{position:absolute;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;z-index:10}
-#name{font-weight:950;font-size:18px;letter-spacing:.2px}
-#status{font-size:11px;opacity:.78;margin-top:2px}
-#topRight{display:flex;gap:8px}
-.topbtn{pointer-events:auto;width:48px;height:48px;border:0;border-radius:14px;font-size:21px;background:#fff;color:#111;box-shadow:0 4px 18px #0004}
-#help{position:absolute;top:76px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;z-index:4}
-#look{position:absolute;right:0;top:0;width:72%;height:80%;pointer-events:auto}
-#cross{position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4px;border:2px solid #fff;border-radius:50%;opacity:.72;box-shadow:0 0 8px #000}
-#joy{position:absolute;left:24px;bottom:max(28px,env(safe-area-inset-bottom));width:150px;height:150px;border-radius:50%;background:#ffffff12;border:3px solid #ffffff30;pointer-events:auto;box-shadow:0 8px 30px #0003}
-#stick{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px;border-radius:50%;background:#ffffff40;border:2px solid #ffffff75}
-#buttons{position:absolute;right:18px;bottom:max(30px,env(safe-area-inset-bottom));display:flex;gap:9px;pointer-events:auto;align-items:flex-end}
-.act{width:74px;height:74px;border-radius:50%;border:1px solid #ffffff38;background:#17212bd9;color:#fff;font-weight:950;font-size:10px;backdrop-filter:blur(8px);box-shadow:0 6px 20px #0004}
-.act.on{background:#2f9e63}
-#panel,#mapPanel,#dialog,#quest,#spawnPanel{position:fixed;z-index:30;background:rgba(7,16,24,.96);color:#fff;border:1px solid #ffffff28;border-radius:18px;backdrop-filter:blur(18px);display:none;box-shadow:0 18px 55px #0008}
-#panel.open,#mapPanel.open,#spawnPanel.open{display:block}
-#panel{right:12px;top:68px;width:min(320px,calc(100vw - 24px));padding:16px;max-height:76vh;overflow:auto}
-#mapPanel{left:12px;top:68px;width:min(310px,calc(100vw - 24px));padding:12px}
-#map{width:100%;aspect-ratio:1;border-radius:12px;background:#245d35;border:1px solid #ffffff25;display:block}
-#mapHint{font-size:10px;opacity:.72;margin-top:7px;line-height:1.3}
-#dialog{left:50%;bottom:calc(max(30px,env(safe-area-inset-bottom)) + 125px);transform:translateX(-50%);width:min(410px,calc(100vw - 28px));padding:14px;display:none}
-#dialogName{font-weight:950;font-size:14px}
-.dialogText{font-size:13px;line-height:1.4;margin-top:5px}
-.dialogActions{display:flex;gap:7px;margin-top:10px}
-.dBtn{flex:1;border:1px solid #ffffff25;background:#ffffff12;color:#fff;border-radius:10px;padding:9px;font-weight:800;font-size:11px}
-#quest{left:12px;bottom:calc(max(30px,env(safe-area-inset-bottom)) + 180px);width:min(345px,calc(100vw - 24px));padding:12px;display:block}
-#questTitle{font-weight:950}
-.small{font-size:11px;opacity:.74;line-height:1.35}
-.row{margin:13px 0}
-.row label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px}
-input,select{width:100%}
-select{padding:9px;border-radius:10px;background:#17232d;color:#fff;border:1px solid #ffffff22}
-.toggle{display:flex;gap:8px;align-items:center;font-size:12px}
-.spawnGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.spawnBtn{border:1px solid #ffffff20;background:#ffffff10;color:#fff;border-radius:12px;padding:12px 8px;font-weight:800;font-size:11px}
-#loading{position:fixed;inset:0;z-index:50;background:#08111a;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center}
-.loadingHide{display:none!important}
-.spinner{width:42px;height:42px;border:4px solid #ffffff20;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 15px}
-@keyframes spin{to{transform:rotate(360deg)}}
-#toast{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);background:#071018ee;color:#fff;padding:12px 16px;border-radius:14px;display:none;font-size:12px;text-align:center;box-shadow:0 12px 40px #0008;max-width:85vw}
-#compass{position:absolute;right:13px;top:128px;font-size:10px;opacity:.7;background:#07101899;border-radius:12px;padding:6px 8px}
-
-#chatPanel,#appPanel,#helpRequest{position:fixed;z-index:35;background:rgba(7,16,24,.97);color:#fff;border:1px solid #ffffff28;border-radius:18px;backdrop-filter:blur(18px);box-shadow:0 18px 55px #0008;display:none}
-#chatPanel.open,#appPanel.open,#helpRequest.open{display:flex}
-#chatPanel{right:12px;top:68px;width:min(390px,calc(100vw - 24px));height:min(590px,calc(100vh - 90px));flex-direction:column;overflow:hidden}
-#chatHead{padding:14px;border-bottom:1px solid #ffffff18;display:flex;align-items:center;gap:10px}
-#chatAvatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#ffffff15;font-size:22px}
-#chatMessages{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;touch-action:pan-y}
-.msg{max-width:85%;padding:9px 11px;border-radius:14px;font-size:12px;line-height:1.4;white-space:pre-wrap}
-.msg.npc{align-self:flex-start;background:#ffffff12}
-.msg.me{align-self:flex-end;background:#245dca}
-.msg.system{align-self:center;background:#2f9e6350;font-size:10px}
-#chatQuick{display:flex;gap:6px;overflow:auto;padding:7px 10px;border-top:1px solid #ffffff12}
-.quick{flex:0 0 auto;border:1px solid #ffffff20;background:#ffffff0d;color:#fff;border-radius:10px;padding:7px 9px;font-size:10px}
-#chatForm{display:flex;gap:7px;padding:10px;border-top:1px solid #ffffff18}
-#chatInput{flex:1;min-width:0;border:1px solid #ffffff20;border-radius:12px;background:#fff;color:#111;padding:11px;font-size:12px;touch-action:auto}
-#sendChat{border:0;border-radius:12px;background:#2f9e63;color:#fff;padding:0 14px;font-weight:900}
-#appPanel{right:12px;top:68px;width:min(330px,calc(100vw - 24px));padding:16px;flex-direction:column;gap:10px}
-.installBtn{border:1px solid #ffffff22;background:#ffffff12;color:#fff;border-radius:12px;padding:12px;font-weight:850;text-align:left}
-#helpRequest{left:50%;bottom:calc(max(30px,env(safe-area-inset-bottom)) + 125px);transform:translateX(-50%);width:min(430px,calc(100vw - 28px));padding:14px;flex-direction:column}
-.helpTitle{font-weight:950;font-size:16px}
-.helpNeed{margin-top:5px;font-size:12px;line-height:1.4}
-.helpActions{display:flex;gap:7px;margin-top:11px}
-.helpActions button{flex:1;border:1px solid #ffffff20;background:#ffffff12;color:#fff;border-radius:10px;padding:10px;font-weight:850;font-size:11px}
-.accept{background:#2f9e63!important}
-.realism{font-size:10px;opacity:.7;line-height:1.35;margin-top:6px}
-#aiState{font-weight:700}
-</style>
-</head>
-<body>
-<canvas id="game"></canvas>
-
-<div id="loading">
-<div>
-<div class="spinner"></div>
-<b id="loadText">Cargando Mundo Vivo V15…</b>
-<div style="font-size:11px;opacity:.6;margin-top:7px">
-Vegetación • montañas • casas • animales • vehículos • agua • NPC
-</div>
-</div>
+  <div>
+    <div class="spinner"></div>
+    <b id="loadText">Cargando Mundo Vivo V15.1…</b>
+    <div style="font-size:11px;opacity:.6;margin-top:7px">
+      Vegetación • montañas • casas • animales • vehículos • agua • NPC
+    </div>
+  </div>
 </div>
 
 <div id="hud">
-<div id="top">
-<div class="box">
-<div id="name">🌎 MUNDO VIVO <span style="opacity:.5">V15 • IA</span></div>
-<div id="status">Exploración • 360° • Día • A pie</div>
-</div>
+ <div id="top">
+  <div class="box">
+   <div id="name">🌎 MUNDO VIVO <span style="opacity:.5">V15.1 • IA</span></div>
+   <div id="status">Exploración • 360° • Día • A pie</div>
+  </div>
 
-<div id="topRight">
-<button class="topbtn" id="mapBtn">🗺️</button>
-<button class="topbtn" id="spawnBtn">🏗️</button>
-<button class="topbtn" id="chatBtn">💬</button>
-<button class="topbtn" id="appBtn">📲</button>
-<button class="topbtn" id="gear">⚙️</button>
-</div>
-</div>
+  <div id="topRight">
+   <button class="topbtn" id="mapBtn">🗺️</button>
+   <button class="topbtn" id="spawnBtn">🏗️</button>
+   <button class="topbtn" id="chatBtn">💬</button>
+   <button class="topbtn" id="appBtn">📲</button>
+   <button class="topbtn" id="gear">⚙️</button>
+  </div>
+ </div>
 
-<div id="help" class="box">
-Arrastra para mirar • Joystick para caminar • Toca personas y casas
-</div>
+ <div id="help" class="box">
+  Arrastra para mirar • Joystick para caminar • Toca personas y casas
+ </div>
 
-<div id="compass">N 0°</div>
-<div id="look"></div>
-<div id="cross"></div>
-<div id="joy"><div id="stick"></div></div>
+ <div id="compass">N 0°</div>
+ <div id="look"></div>
+ <div id="cross"></div>
 
-<div id="buttons">
-<button class="act" id="jump">SALTAR</button>
-<button class="act" id="fly">VOLAR</button>
-<button class="act" id="run">CORRER</button>
-</div>
+ <div id="joy">
+  <div id="stick"></div>
+ </div>
+
+ <div id="buttons">
+  <button class="act" id="jump">SALTAR</button>
+  <button class="act" id="fly">VOLAR</button>
+  <button class="act" id="run">CORRER</button>
+ </div>
 </div>
 
 <div id="panel">
-<b style="font-size:18px">⚙️ Configuración</b>
+ <b style="font-size:18px">⚙️ Configuración</b>
 
-<div class="row">
-<label>Tamaño controles <b id="sv">100%</b></label>
-<input id="size" type="range" min="70" max="140" value="100">
-</div>
+ <div class="row">
+  <label>Tamaño controles <b id="sv">100%</b></label>
+  <input id="size" type="range" min="70" max="140" value="100">
+ </div>
 
-<div class="row">
-<label>Sensibilidad cámara <b id="cv">100%</b></label>
-<input id="sens" type="range" min="40" max="200" value="100">
-</div>
+ <div class="row">
+  <label>Sensibilidad cámara <b id="cv">100%</b></label>
+  <input id="sens" type="range" min="40" max="200" value="100">
+ </div>
 
-<div class="row">
-<label>Gráficos</label>
-<select id="quality">
-<option value="1">Ultra</option>
-<option value=".8">Alta</option>
-<option value=".65">Media</option>
-<option value=".5">Ahorro</option>
-</select>
-</div>
+ <div class="row">
+  <label>Gráficos</label>
+  <select id="quality">
+   <option value="1">Ultra</option>
+   <option value=".8">Alta</option>
+   <option value=".65">Media</option>
+   <option value=".5">Ahorro</option>
+  </select>
+ </div>
 
-<div class="row">
-<label>Hora <b id="tv">12:00</b></label>
-<input id="time" type="range" min="0" max="24" value="12" step=".25">
-</div>
+ <div class="row">
+  <label>Hora <b id="tv">12:00</b></label>
+  <input id="time" type="range" min="0" max="24" value="12" step=".25">
+ </div>
 
-<div class="row toggle">
-<input id="sound" type="checkbox" checked> Sonidos del mundo
-</div>
+ <div class="row toggle">
+  <input id="sound" type="checkbox" checked>
+  Sonidos del mundo
+ </div>
 
-<div class="row toggle">
-<input id="names" type="checkbox" checked> Nombres de personajes
-</div>
+ <div class="row toggle">
+  <input id="names" type="checkbox" checked>
+  Nombres de personajes
+ </div>
 
-<div class="row toggle">
-<input id="shadows" type="checkbox" checked> Sombras dinámicas
-</div>
+ <div class="row toggle">
+  <input id="shadows" type="checkbox" checked>
+  Sombras dinámicas
+ </div>
 
-<div class="small">
-El mundo funciona en el navegador. El audio se activa después de tocar la pantalla. El modo vuelo permite subir, bajar y desplazarte.
-</div>
+ <div class="small">
+  El mundo funciona en el navegador. El audio se activa después de tocar la pantalla.
+  El modo vuelo permite subir, bajar y desplazarte.
+ </div>
 </div>
 
 <div id="mapPanel">
-<b>🗺️ Mapa del mundo</b>
-<canvas id="map"></canvas>
-<div id="mapHint">
-Toca cualquier punto para teletransportarte. Los puntos rojos son edificios y los amarillos habitantes.
-</div>
+ <b>🗺️ Mapa del mundo</b>
+ <canvas id="map"></canvas>
+ <div id="mapHint">
+  Toca cualquier punto para teletransportarte. Los puntos rojos son edificios y los amarillos habitantes.
+ </div>
 </div>
 
 <div id="spawnPanel">
-<div style="font-weight:950;font-size:17px">🏗️ Crear en el mundo</div>
-<div class="small" style="margin-top:5px">
-Toca un botón y aparecerá cerca de ti.
-</div>
+ <div style="font-weight:950;font-size:17px">🏗️ Crear en el mundo</div>
+ <div class="small" style="margin-top:5px">
+  Toca un botón y aparecerá cerca de ti.
+ </div>
 
-<div class="spawnGrid">
-<button class="spawnBtn" data-spawn="house">🏠 Casa</button>
-<button class="spawnBtn" data-spawn="building">🏢 Edificio</button>
-<button class="spawnBtn" data-spawn="tree">🌳 Árbol</button>
-<button class="spawnBtn" data-spawn="animal">🐕 Animal</button>
-<button class="spawnBtn" data-spawn="car">🚗 Vehículo</button>
-<button class="spawnBtn" data-spawn="npc">🧑 Persona</button>
-<button class="spawnBtn" data-spawn="lake">🌊 Agua</button>
-<button class="spawnBtn" data-spawn="bird">🐦 Aves</button>
-</div>
-</div>
+ <div class="spawnGrid">
+  <button class="spawnBtn" data-spawn="house">🏠 Casa</button>
+  <button class="spawnBtn" data-spawn="building">🏢 Edificio</button>
+  <button class="spawnBtn" data-spawn="tree">🌳 Árbol</button>
+  <button class="spawnBtn" data-spawn="animal">🐕 Animal</button>
+  <button class="spawnBtn" data-spawn="car">🚗 Vehículo</button>
+  <button class="spawnBtn" data-spawn="npc">🧑 Persona</button>
+  <button class="spawnBtn" data-spawn="lake">🌊 Agua</button>
+  <button class="spawnBtn" data-spawn="bird">🐦 Aves</button>
+ </div>
+</div><div id="dialog">
+  <div id="dialogName">Personaje</div>
+  <div class="dialogText" id="dialogText"></div>
 
-<div id="dialog">
-<div id="dialogName">Personaje</div>
-<div class="dialogText" id="dialogText"></div>
+  <div class="dialogActions">
+    <button class="dBtn" id="helpBtn">🤝 AYUDAR</button>
+    <button class="dBtn" id="followBtn">🧭 IR CONMIGO</button>
+    <button class="dBtn" id="closeDialog">CERRAR</button>
+  </div>
 
-<div class="dialogActions">
-<button class="dBtn" id="helpBtn">🤝 AYUDAR</button>
-<button class="dBtn" id="followBtn">🧭 IR CONMIGO</button>
-<button class="dBtn" id="closeDialog">CERRAR</button>
-</div>
-
-<div class="small" id="dialogAction" style="margin-top:8px"></div>
+  <div class="small" id="dialogAction" style="margin-top:8px"></div>
 </div>
 
 <div id="quest">
-<div id="questTitle">📌 Situación del mundo</div>
-<div class="small" id="questText">
-Explora, escucha a los habitantes y ayúdalos según lo que esté ocurriendo.
-</div>
+  <div id="questTitle">📌 Situación del mundo</div>
+  <div class="small" id="questText">
+    Explora, escucha a los habitantes y ayúdalos según lo que esté ocurriendo.
+  </div>
 </div>
 
 <div id="helpRequest">
-<div class="helpTitle">🆘 Petición de ayuda</div>
-<div class="helpNeed" id="helpNeed">
-Un habitante necesita tu ayuda.
+  <div class="helpTitle">🆘 Petición de ayuda</div>
+  <div class="helpNeed" id="helpNeed">
+    Un habitante necesita tu ayuda.
+  </div>
+
+  <div class="helpActions">
+    <button class="accept" id="acceptHelp">✅ ACEPTAR</button>
+    <button id="declineHelp">❌ RECHAZAR</button>
+  </div>
 </div>
 
-<div class="helpActions">
-<button class="accept" id="acceptHelp">✅ ACEPTAR</button>
-<button id="declineHelp">❌ RECHAZAR</button>
+<div id="chatPanel">
+  <div id="chatHead">
+    <div id="chatAvatar">🧑</div>
+
+    <div style="flex:1">
+      <b id="chatName">Conversación</b>
+      <div class="small" id="chatState">
+        Personaje del mundo • IA local
+      </div>
+    </div>
+
+    <button
+      class="topbtn"
+      style="width:38px;height:38px;font-size:16px"
+      id="closeChat">×</button>
+  </div>
+
+  <div id="chatMessages"></div>
+
+  <div id="chatQuick">
+    <button class="quick" data-q="¿Qué necesitas?">
+      ¿Qué necesitas?
+    </button>
+
+    <button class="quick" data-q="¿Qué está pasando?">
+      ¿Qué pasa?
+    </button>
+
+    <button class="quick" data-q="¿Dónde puedo ayudarte?">
+      ¿Dónde ayudo?
+    </button>
+
+    <button class="quick" data-q="Sí, te ayudaré.">
+      Te ayudaré
+    </button>
+  </div>
+
+  <form id="chatForm">
+    <input
+      id="chatInput"
+      autocomplete="off"
+      placeholder="Escribe a tu personaje…">
+
+    <button id="sendChat" type="submit">
+      Enviar
+    </button>
+  </form>
 </div>
-</div>const player=new THREE.Group();
+
+<div id="appPanel">
+  <b style="font-size:18px">📲 Acceso directo</b>
+
+  <div class="small">
+    Mundo Vivo puede funcionar como una aplicación independiente
+    en tu pantalla de inicio.
+  </div>
+
+  <button class="installBtn" id="installApp">
+    ➕ Añadir a pantalla de inicio
+  </button>
+
+  <button class="installBtn" id="fullscreenApp">
+    ⛶ Abrir en pantalla completa
+  </button>
+
+  <button class="installBtn" id="aiSettingsBtn">
+    🧠 Configurar IA de personajes
+  </button>
+
+  <div
+    id="aiSettings"
+    style="display:none;padding:10px;border:1px solid #ffffff18;border-radius:12px;background:#ffffff08">
+
+    <div style="font-weight:900;font-size:12px">
+      IA generativa
+    </div>
+
+    <div class="small" style="margin:5px 0 7px">
+      El juego puede usar un servidor seguro en
+      <b>/api/chat</b>.
+      Nunca pongas una API key dentro de este HTML.
+    </div>
+
+    <input
+      id="aiEndpoint"
+      value="/api/chat"
+      placeholder="https://tu-servidor.example/api/chat"
+      style="width:100%;padding:9px;border-radius:9px;border:1px solid #ffffff20;background:#fff;color:#111;font-size:11px">
+
+    <div style="display:flex;gap:6px;margin-top:7px">
+      <button
+        class="installBtn"
+        style="flex:1;padding:9px"
+        id="saveAI">
+        Guardar
+      </button>
+
+      <button
+        class="installBtn"
+        style="flex:1;padding:9px"
+        id="testAI">
+        Probar IA
+      </button>
+    </div>
+
+    <div
+      class="small"
+      id="aiState"
+      style="margin-top:7px">
+      Estado: IA local de respaldo
+    </div>
+  </div>
+
+  <div class="realism">
+    En iPhone: Compartir → “Añadir a pantalla de inicio”.
+    Para IA generativa real, configura un backend seguro;
+    el juego mantiene una IA local si el servidor no responde.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+
+let THREE;
+
+const urls = [
+  "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+  "https://unpkg.com/three@0.180.0/build/three.module.js"
+];
+
+async function loadThree(){
+
+  for(const u of urls){
+
+    try{
+
+      THREE = await import(u);
+
+      if(THREE.Scene){
+        start();
+        return;
+      }
+
+    }catch(e){
+
+      console.warn("Motor 3D no cargó:",e);
+
+    }
+
+  }
+
+  document.getElementById("loadText").textContent =
+    "No se pudo cargar el motor 3D. Recarga la página.";
+
+  setTimeout(window.hideMundoLoader,800);
+}
+
+loadThree();
+
+
+function start(){
+
+let selectedNpc = null;
+let pendingHelpNpc = null;
+let chatNpc = null;
+let deferredInstall = null;
+
+const AI_DEFAULT_ENDPOINT = "/api/chat";
+
+let aiEndpoint =
+  localStorage.getItem("mundoVivoAIEndpoint") ||
+  AI_DEFAULT_ENDPOINT;
+
+let aiOnline = false;
+let aiBusy = false;
+
+
+const canvas = document.getElementById("game");
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias:true,
+  powerPreference:"high-performance"
+});
+
+renderer.setPixelRatio(
+  Math.min(devicePixelRatio,1.5)
+);
+
+renderer.setSize(
+  innerWidth,
+  innerHeight
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.type =
+  THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+  THREE.SRGBColorSpace;
+
+
+const scene =
+  new THREE.Scene();
+
+const camera =
+  new THREE.PerspectiveCamera(
+    67,
+    innerWidth / innerHeight,
+    .05,
+    1000
+  );
+
+scene.background =
+  new THREE.Color(0x8acbf0);
+
+scene.fog =
+  new THREE.Fog(
+    0x8acbf0,
+    95,
+    430
+  );
+
+
+const skyDome =
+  new THREE.Mesh(
+    new THREE.SphereGeometry(
+      480,
+      48,
+      24
+    ),
+    new THREE.MeshBasicMaterial({
+      color:0x9ed8f5,
+      side:THREE.BackSide,
+      transparent:true,
+      opacity:.92
+    })
+  );
+
+scene.add(skyDome);
+
+
+const hemi =
+  new THREE.HemisphereLight(
+    0xbfeaff,
+    0x3b5138,
+    1.7
+  );
+
+scene.add(hemi);
+
+
+const sun =
+  new THREE.DirectionalLight(
+    0xffffff,
+    2.8
+  );
+
+sun.position.set(
+  60,
+  110,
+  40
+);
+
+sun.castShadow = true;
+
+sun.shadow.mapSize.set(
+  1536,
+  1536
+);
+
+sun.shadow.camera.left = -180;
+sun.shadow.camera.right = 180;
+sun.shadow.camera.top = 180;
+sun.shadow.camera.bottom = -180;
+
+scene.add(sun);
+
+
+const world =
+  new THREE.Group();
+
+scene.add(world);
+
+
+const dynamic =
+  new THREE.Group();
+
+world.add(dynamic);
+
+
+const mat =
+  c => new THREE.MeshStandardMaterial({
+    color:c,
+    roughness:.82
+  });
+
+
+const grass =
+  mat(0x4d9c50);
+
+const road =
+  mat(0x8e7960);
+
+const trunk =
+  mat(0x684127);
+
+const leaf =
+  mat(0x247b36);
+
+const leaf2 =
+  mat(0x3d9c47);
+
+const rock =
+  mat(0x677078);
+
+const snow =
+  mat(0xe9f4f6);
+
+const waterMat =
+  new THREE.MeshStandardMaterial({
+    color:0x258fca,
+    roughness:.25,
+    metalness:.05,
+    transparent:true,
+    opacity:.82
+  });
+
+const wall =
+  mat(0xd7c09a);
+
+const roof =
+  mat(0x8b3e31);
+
+const glass =
+  new THREE.MeshStandardMaterial({
+    color:0x65b8dc,
+    metalness:.25,
+    roughness:.18
+  });
+
+const skin =
+  mat(0xd69a70);
+
+const hair =
+  mat(0x23170e);
+
+const pants =
+  mat(0x23344d);
+
+const black =
+  mat(0x1d2328);
+
+
+const ground =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      700,
+      700
+    ),
+    grass
+  );
+
+ground.rotation.x =
+  -Math.PI/2;
+
+ground.receiveShadow = true;
+
+world.add(ground);
+
+
+const path =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      18,
+      700
+    ),
+    road
+  );
+
+path.rotation.x =
+  -Math.PI/2;
+
+path.position.y =
+  .025;
+
+path.receiveShadow = true;
+
+world.add(path);
+
+
+const crossRoad =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      700,
+      13
+    ),
+    road
+  );
+
+crossRoad.rotation.x =
+  -Math.PI/2;
+
+crossRoad.position.set(
+  0,
+  .03,
+  -45
+);
+
+world.add(crossRoad);
+
+
+function mountain(
+  x,
+  z,
+  s=1
+){
+
+  const g =
+    new THREE.Group();
+
+  const m =
+    new THREE.Mesh(
+      new THREE.ConeGeometry(
+        24*s,
+        42*s,
+        7
+      ),
+      rock
+    );
+
+  const cap =
+    new THREE.Mesh(
+      new THREE.ConeGeometry(
+        9*s,
+        14*s,
+        7
+      ),
+      snow
+    );
+
+  m.position.y =
+    21*s;
+
+  cap.position.y =
+    40*s;
+
+  g.add(m,cap);
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  m.castShadow =
+    cap.castShadow = true;
+
+  world.add(g);
+}
+
+
+[
+  [-180,-120,2],
+  [-115,-170,1.4],
+  [90,-170,1.8],
+  [190,-100,2.1],
+  [-190,100,1.7],
+  [150,130,1.5]
+].forEach(
+  a => mountain(...a)
+);
+
+
+function tree(
+  x,
+  z,
+  s=1,
+  detail=true,
+  parent=world
+){
+
+  const g =
+    new THREE.Group();
+
+  const t =
+    new THREE.Mesh(
+      new THREE.CylinderGeometry(
+        .22*s,
+        .48*s,
+        3.2*s,
+        9
+      ),
+      trunk
+    );
+
+  t.position.y =
+    1.6*s;
+
+  t.castShadow = true;
+
+  g.add(t);
+
+
+  const c =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        1.25*s,
+        12,
+        9
+      ),
+      leaf
+    );
+
+  c.position.y =
+    3.25*s;
+
+  c.castShadow = true;
+
+  g.add(c);
+
+
+  if(detail){
+
+    const c2 =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          .72*s,
+          10,
+          8
+        ),
+        leaf2
+      );
+
+    c2.position.set(
+      .75*s,
+      3.0*s,
+      .2*s
+    );
+
+    c2.castShadow = true;
+
+    g.add(c2);
+
+  }
+
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  parent.add(g);
+
+  return g;
+}
+
+
+for(
+  let i=0;
+  i<260;
+  i++
+){
+
+  const x =
+    (Math.random()-.5)*600;
+
+  const z =
+    (Math.random()-.5)*600;
+
+  if(
+    Math.abs(x)>12 ||
+    Math.abs(z+45)>12
+  ){
+
+    tree(
+      x,
+      z,
+      .45+Math.random()*1.15,
+      true
+    );
+
+  }
+
+}
+
+
+function bush(
+  x,
+  z,
+  s=.8
+){
+
+  const g =
+    new THREE.Group();
+
+  for(
+    let i=0;
+    i<4;
+    i++
+  ){
+
+    const b =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          .55*s,
+          9,
+          7
+        ),
+        leaf2
+      );
+
+    b.position.set(
+      (Math.random()-.5)*.9*s,
+      .45*s+Math.random()*.25,
+      (Math.random()-.5)*.9*s
+    );
+
+    b.castShadow = true;
+
+    g.add(b);
+
+  }
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  world.add(g);
+}
+
+
+for(
+  let i=0;
+  i<170;
+  i++
+){
+
+  bush(
+    (Math.random()-.5)*450,
+    (Math.random()-.5)*450,
+    .45+Math.random()*.7
+  );
+
+}
+
+
+const lake =
+  new THREE.Mesh(
+    new THREE.CircleGeometry(
+      42,
+      80
+    ),
+    waterMat
+  );
+
+lake.rotation.x =
+  -Math.PI/2;
+
+lake.position.set(
+  78,
+  .05,
+  -82
+);
+
+world.add(lake);
+
+
+const river =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      24,
+      250
+    ),
+    waterMat
+  );
+
+river.rotation.x =
+  -Math.PI/2;
+
+river.position.set(
+  -72,
+  .06,
+  35
+);
+
+world.add(river);
+
+
+const waterObjs = [
+  lake,
+  river
+];
+
+
+function house(
+  x,
+  z,
+  s=1,
+  parent=world
+){
+
+  const g =
+    new THREE.Group();
+
+  const b =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        6*s,
+        3.3*s,
+        6*s
+      ),
+      wall
+    );
+
+  const r =
+    new THREE.Mesh(
+      new THREE.ConeGeometry(
+        4.7*s,
+        2.4*s,
+        4
+      ),
+      roof
+    );
+
+  const d =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        .95*s,
+        1.8*s,
+        .14*s
+      ),
+      mat(0x4b2b1e)
+    );
+
+  b.position.y =
+    1.65*s;
+
+  r.position.y =
+    4.45*s;
+
+  r.rotation.y =
+    Math.PI/4;
+
+  d.position.set(
+    0,
+    .9*s,
+    3.06*s
+  );
+
+  [
+    b,
+    r,
+    d
+  ].forEach(q=>{
+    q.castShadow=true;
+    q.receiveShadow=true;
+  });
+
+  g.add(
+    b,
+    r,
+    d
+  );
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  g.userData = {
+    type:"house",
+    enterable:true
+  };
+
+  parent.add(g);
+
+  return g;
+}
+
+
+function building(
+  x,
+  z,
+  s=1,
+  parent=world
+){
+
+  const g =
+    new THREE.Group();
+
+  const b =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        8*s,
+        10*s,
+        8*s
+      ),
+      wall
+    );
+
+  const glass1 =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        8.05*s,
+        5*s,
+        .12*s
+      ),
+      glass
+    );
+
+  const glass2 =
+    glass1.clone();
+
+  b.position.y =
+    5*s;
+
+  glass1.position.set(
+    0,
+    5.3*s,
+    4.06*s
+  );
+
+  glass2.position.set(
+    4.06*s,
+    5.3*s,
+    0
+  );
+
+  glass2.rotation.y =
+    Math.PI/2;
+
+  g.add(
+    b,
+    glass1,
+    glass2
+  );
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  g.userData = {
+    type:"building",
+    enterable:true
+  };
+
+  b.castShadow = true;
+
+  parent.add(g);
+
+  return g;
+}
+
+
+const houses = [
+  house(18,-25,1),
+  house(-28,-58,1.2),
+  house(38,18,.95),
+  house(-44,36,1.1),
+  house(55,-2,.8)
+];
+
+
+const buildings = [
+  building(-18,4,.85),
+  building(65,38,.7)
+];
+
+
+function label(text){
+
+  const c =
+    document.createElement("canvas");
+
+  const ctx =
+    c.getContext("2d");
+
+  c.width = 300;
+  c.height = 70;
+
+  ctx.fillStyle =
+    "rgba(0,0,0,.72)";
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    4,
+    8,
+    292,
+    54,
+    13
+  );
+
+  ctx.fill();
+
+  ctx.fillStyle =
+    "white";
+
+  ctx.font =
+    "bold 25px system-ui";
+
+  ctx.textAlign =
+    "center";
+
+  ctx.fillText(
+    text,
+    150,
+    43
+  );
+
+  const tx =
+    new THREE.CanvasTexture(c);
+
+  const m =
+    new THREE.SpriteMaterial({
+      map:tx,
+      transparent:true,
+      depthTest:false
+    });
+
+  const s =
+    new THREE.Sprite(m);
+
+  s.scale.set(
+    3.2,
+    .75,
+    1
+  );
+
+  return s;
+}
+
+
+const npcs = [];
+
+selectedNpc = null;
+chatNpc = null;
+pendingHelpNpc = null;
+deferredInstall = null;
+
+
+function person(
+  name,
+  x,
+  z,
+  shirt,
+  need
+){
+
+  const g =
+    new THREE.Group();
+
+  const shirtMat =
+    mat(shirt);
+
+  const eyeMat =
+    mat(0x151515);
+
+  const shoeMat =
+    black;
+
+
+  const torso =
+    new THREE.Mesh(
+      new THREE.CapsuleGeometry(
+        .43,
+        .78,
+        7,
+        12
+      ),
+      shirtMat
+    );
+
+
+  const neck =
+    new THREE.Mesh(
+      new THREE.CylinderGeometry(
+        .12,
+        .13,
+        .16,
+        10
+      ),
+      skin
+    );
+
+
+  const head =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .37,
+        20,
+        16
+      ),
+      skin
+    );
+
+
+  const h =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .39,
+        20,
+        12
+      ),
+      hair
+    );
+
+
+  torso.position.y =
+    1.42;
+
+  neck.position.y =
+    1.94;
+
+  head.position.y =
+    2.3;
+
+  h.scale.set(
+    1,
+    .58,
+    1
+  );
+
+  h.position.y =
+    2.57;
+
+
+  const e1 =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .035,
+        8,
+        6
+      ),
+      eyeMat
+    );
+
+  const e2 =
+    e1.clone();
+
+  e1.position.set(
+    -.13,
+    2.34,
+    .345
+  );
+
+  e2.position.set(
+    .13,
+    2.34,
+    .345
+  );
+
+
+  const armL =
+    new THREE.Group();
+
+  const armR =
+    new THREE.Group();
+
+  const a1 =
+    new THREE.Mesh(
+      new THREE.CapsuleGeometry(
+        .12,
+        .62,
+        6,
+        9
+      ),
+      shirtMat
+    );
+
+  const a2 =
+    a1.clone();
+
+  a1.position.y =
+    -.32;
+
+  a2.position.y =
+    -.32;
+
+  armL.add(a1);
+  armR.add(a2);
+
+  armL.position.set(
+    -.55,
+    1.72,
+    0
+  );
+
+  armR.position.set(
+    .55,
+    1.72,
+    0
+  );
+
+
+  const legL =
+    new THREE.Group();
+
+  const legR =
+    new THREE.Group();
+
+  const l1 =
+    new THREE.Mesh(
+      new THREE.CapsuleGeometry(
+        .14,
+        .72,
+        6,
+        9
+      ),
+      pants
+    );
+
+  const l2 =
+    l1.clone();
+
+  l1.position.y =
+    -.36;
+
+  l2.position.y =
+    -.36;
+
+  legL.add(l1);
+  legR.add(l2);
+
+  legL.position.set(
+    -.2,
+    .9,
+    0
+  );
+
+  legR.position.set(
+    .2,
+    .9,
+    0
+  );
+
+
+  const f1 =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        .25,
+        .15,
+        .45
+      ),
+      shoeMat
+    );
+
+  const f2 =
+    f1.clone();
+
+  f1.position.set(
+    0,
+    -.72,
+    .12
+  );
+
+  f2.position.set(
+    0,
+    -.72,
+    .12
+  );
+
+  legL.add(f1);
+  legR.add(f2);
+
+
+  g.add(
+    torso,
+    neck,
+    head,
+    h,
+    e1,
+    e2,
+    armL,
+    armR,
+    legL,
+    legR
+  );
+
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+
+  const tag =
+    label(name);
+
+  tag.position.y =
+    3.28;
+
+  g.add(tag);
+
+
+  g.userData = {
+
+    type:"npc",
+
+    name,
+
+    need,
+
+    tag,
+
+    helped:false,
+
+    following:false,
+
+    home:null,
+
+    job:[
+      "agricultor",
+      "médica",
+      "mecánico",
+      "comerciante",
+      "explorador"
+    ][
+      Math.floor(
+        Math.random()*5
+      )
+    ],
+
+    mood:"tranquilo",
+
+    personality:
+      "amable y curioso",
+
+    chatHistory:[],
+
+    energy:
+      50+Math.random()*50,
+
+    armL,
+    armR,
+    legL,
+    legR,
+
+    walkPhase:
+      Math.random()*Math.PI*2
+
+  };
+
+
+  world.add(g);
+
+  npcs.push(g);
+
+  return g;
+}
+
+
+person(
+  "Ana",
+  7,
+  -17,
+  0x2d65c8,
+  "Necesito agua para mi familia."
+);
+
+person(
+  "Luis",
+  -8,
+  -34,
+  0xa8463e,
+  "Se perdió mi perro cerca del lago."
+);
+
+person(
+  "Marta",
+  25,
+  15,
+  0x3e8d4e,
+  "Hay aves heridas por el camino."
+);
+
+person(
+  "Diego",
+  -18,
+  20,
+  0x8b58a7,
+  "Mi casa necesita ayuda."
+);
+
+person(
+  "Sofía",
+  48,
+  -18,
+  0xb8752f,
+  "Mi coche se quedó sin combustible."
+);
+
+
+const animals = [];
+
+
+function animal(
+  x,
+  z,
+  type="dog"
+){
+
+  const g =
+    new THREE.Group();
+
+  const fur =
+    mat(
+      type==="cat"
+      ? 0x7b7f86
+      : 0x8a5b37
+    );
+
+  const b =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .65,
+        12,
+        8
+      ),
+      fur
+    );
+
+  const h =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .38,
+        12,
+        8
+      ),
+      fur
+    );
+
+  b.scale.set(
+    1.35,
+    .78,
+    1.75
+  );
+
+  b.position.y =
+    .72;
+
+  h.position.set(
+    0,
+    1.03,
+    1.05
+  );
+
+
+  const l = [];
+
+  for(
+    let i=0;
+    i<4;
+    i++
+  ){
+
+    const p =
+      new THREE.Mesh(
+        new THREE.CylinderGeometry(
+          .09,
+          .11,
+          .5,
+          7
+        ),
+        fur
+      );
+
+    p.position.set(
+      i<2 ? -.42 : .42,
+      .35,
+      i%2 ? -.48 : .48
+    );
+
+    l.push(p);
+
+    g.add(p);
+  }
+
+
+  g.add(
+    b,
+    h,
+    ...l
+  );
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  g.userData = {
+    type:"animal",
+    phase:Math.random()*10,
+    speed:.4+Math.random()*.7
+  };
+
+  world.add(g);
+
+  animals.push(g);
+
+  return g;
+}
+
+
+for(
+  let i=0;
+  i<28;
+  i++
+){
+
+  animal(
+    (Math.random()-.5)*260,
+    (Math.random()-.5)*260,
+    i%3===0 ? "cat" : "dog"
+  );
+
+}
+
+
+const cars = [];
+
+
+function car(
+  x,
+  z,
+  scale=1
+){
+
+  const g =
+    new THREE.Group();
+
+  const body =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        3.4*scale,
+        .8*scale,
+        6*scale
+      ),
+      mat(0x3e67c7)
+    );
+
+  const top =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        2.8*scale,
+        .8*scale,
+        3.2*scale
+      ),
+      glass
+    );
+
+  const wheelMat =
+    black;
+
+
+  body.position.y =
+    .75*scale;
+
+  top.position.y =
+    1.3*scale;
+
+
+  for(
+    const sx of [-1,1]
+  )
+  for(
+    const sz of [-1,1]
+  ){
+
+    const w =
+      new THREE.Mesh(
+        new THREE.CylinderGeometry(
+          .45*scale,
+          .45*scale,
+          .28*scale,
+          14
+        ),
+        wheelMat
+      );
+
+    w.rotation.z =
+      Math.PI/2;
+
+    w.position.set(
+      sx*1.45*scale,
+      .45*scale,
+      sz*2.05*scale
+    );
+
+    g.add(w);
+
+  }
+
+
+  g.add(
+    body,
+    top
+  );
+
+  g.position.set(
+    x,
+    0,
+    z
+  );
+
+  g.rotation.y =
+    Math.random()*Math.PI*2;
+
+  g.userData = {
+    type:"car",
+    speed:.8+Math.random()*1.1
+  };
+
+  world.add(g);
+
+  cars.push(g);
+
+  return g;
+}
+
+
+for(
+  let i=0;
+  i<8;
+  i++
+){
+
+  cars.push(
+    car(
+      (Math.random()-.5)*120,
+      (Math.random()-.5)*120,
+      .8+Math.random()*.35
+    )
+  );
+
+}
+
+
+const birds = [];
+
+
+function bird(
+  x,
+  y,
+  z
+){
+
+  const g =
+    new THREE.Group();
+
+  const m =
+    black;
+
+  const b =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .18,
+        8,
+        6
+      ),
+      m
+    );
+
+  const w1 =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        .62,
+        .05,
+        .18
+      ),
+      m
+    );
+
+  const w2 =
+    w1.clone();
+
+  w1.position.x =
+    -.34;
+
+  w2.position.x =
+    .34;
+
+  g.add(
+    b,
+    w1,
+    w2
+  );
+
+  g.position.set(
+    x,
+    y,
+    z
+  );
+
+  g.userData = {
+    type:"bird",
+    phase:Math.random()*10
+  };
+
+  world.add(g);
+
+  birds.push(g);
+
+  return g;
+}
+
+
+for(
+  let i=0;
+  i<22;
+  i++
+){
+
+  bird(
+    (Math.random()-.5)*350,
+    14+Math.random()*28,
+    (Math.random()-.5)*350
+  );
+
+}
+
+
+const clouds = [];
+
+
+function cloud(
+  x,
+  y,
+  z,
+  s=1
+){
+
+  const g =
+    new THREE.Group();
+
+  for(
+    let i=0;
+    i<7;
+    i++
+  ){
+
+    const q =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          (1.4+Math.random())*s,
+          10,
+          8
+        ),
+        new THREE.MeshBasicMaterial({
+          color:0xffffff,
+          transparent:true,
+          opacity:.72
+        })
+      );
+
+    q.position.set(
+      (i-3)*1.35*s,
+      Math.random()*1*s,
+      Math.random()*1*s
+    );
+
+    g.add(q);
+
+  }
+
+  g.position.set(
+    x,
+    y,
+    z
+  );
+
+  world.add(g);
+
+  clouds.push(g);
+
+  return g;
+}
+
+
+for(
+  let i=0;
+  i<14;
+  i++
+){
+
+  cloud(
+    (Math.random()-.5)*450,
+    48+Math.random()*18,
+    (Math.random()-.5)*350,
+    .8+Math.random()*1.2
+  );
+
+}
+
+
+const detailGroup =
+  new THREE.Group();
+
+world.add(detailGroup);
+
+
+function rockDetail(
+  x,
+  z,
+  s=1
+){
+
+  const q =
+    new THREE.Mesh(
+      new THREE.DodecahedronGeometry(
+        .35*s,
+        0
+      ),
+      rock
+    );
+
+  q.scale.y =
+    .55;
+
+  q.position.set(
+    x,
+    .25*s,
+    z
+  );
+
+  q.rotation.set(
+    Math.random(),
+    Math.random(),
+    Math.random()
+  );
+
+  q.castShadow = true;
+  q.receiveShadow = true;
+
+  detailGroup.add(q);
+}
+
+
+for(
+  let i=0;
+  i<180;
+  i++
+){
+
+  const x =
+    (Math.random()-.5)*560;
+
+  const z =
+    (Math.random()-.5)*560;
+
+  if(
+    Math.abs(x)<18 ||
+    Math.abs(z+45)<18
+  ) continue;
+
+  rockDetail(
+    x,
+    z,
+    .25+Math.random()*.7
+  );
+
+}
+
+
+function grassPatch(
+  x,
+  z,
+  s=1
+){
+
+  for(
+    let i=0;
+    i<5;
+    i++
+  ){
+
+    const g =
+      new THREE.Mesh(
+        new THREE.ConeGeometry(
+          .035*s,
+          .55*s,
+          5
+        ),
+        new THREE.MeshStandardMaterial({
+          color:
+            i%2
+            ? 0x2e7d32
+            : 0x5aa34b,
+          roughness:1
+        })
+      );
+
+    g.position.set(
+      x+(Math.random()-.5)*.7*s,
+      .27*s,
+      z+(Math.random()-.5)*.7*s
+    );
+
+    g.rotation.z =
+      (Math.random()-.5)*.45;
+
+    detailGroup.add(g);
+
+  }
+}
+
+
+for(
+  let i=0;
+  i<260;
+  i++
+){
+
+  const x =
+    (Math.random()-.5)*520;
+
+  const z =
+    (Math.random()-.5)*520;
+
+  if(
+    Math.abs(x)<15 ||
+    Math.abs(z+45)<15
+  ) continue;
+
+  grassPatch(
+    x,
+    z,
+    .7+Math.random()*1.3
+  );
+
+}
+
+
+for(
+  let i=0;
+  i<14;
+  i++
+){
+
+  cloud(
+    (Math.random()-.5)*450,
+    48+Math.random()*18,
+    (Math.random()-.5)*350,
+    .8+Math.random()*1.2
+  );
+
+}
+
+
+const player =
+  new THREE.Group();
+
 world.add(player);
 
-player.position.set(0,0,5);
-
-const pb=new THREE.Mesh(
-new THREE.CapsuleGeometry(.42,.86,6,10),
-mat(0x2859c7)
+player.position.set(
+  0,
+  0,
+  5
 );
 
-const ph=new THREE.Mesh(
-new THREE.SphereGeometry(.35,16,12),
-skin
+
+const pb =
+  new THREE.Mesh(
+    new THREE.CapsuleGeometry(
+      .42,
+      .86,
+      6,
+      10
+    ),
+    mat(0x2859c7)
+  );
+
+const ph =
+  new THREE.Mesh(
+    new THREE.SphereGeometry(
+      .35,
+      16,
+      12
+    ),
+    skin
+  );
+
+const pHair =
+  new THREE.Mesh(
+    new THREE.SphereGeometry(
+      .38,
+      16,
+      8
+    ),
+    hair
+  );
+
+pb.position.y =
+  1.45;
+
+ph.position.y =
+  2.35;
+
+pHair.scale.y =
+  .55;
+
+pHair.position.y =
+  2.63;
+
+
+const pl1 =
+  new THREE.Mesh(
+    new THREE.CapsuleGeometry(
+      .13,
+      .72,
+      5,
+      8
+    ),
+    pants
+  );
+
+const pl2 =
+  pl1.clone();
+
+pl1.position.set(
+  -.2,
+  .55,
+  0
 );
 
-const pHair=new THREE.Mesh(
-new THREE.SphereGeometry(.38,16,8),
-hair
+pl2.position.set(
+  .2,
+  .55,
+  0
 );
 
-pb.position.y=1.45;
-ph.position.y=2.35;
-
-pHair.scale.y=.55;
-pHair.position.y=2.63;
-
-const pl1=new THREE.Mesh(
-new THREE.CapsuleGeometry(.13,.72,5,8),
-pants
+player.add(
+  pb,
+  ph,
+  pHair,
+  pl1,
+  pl2
 );
 
-const pl2=pl1.clone();
 
-pl1.position.set(-.2,.55,0);
-pl2.position.set(.2,.55,0);
-
-player.add(pb,ph,pHair,pl1,pl2);
-
-
-let yaw=0,
-pitch=-.12,
-moveX=0,
-moveY=0,
-run=false,
-fly=false,
-vy=0,
-grounded=true,
-sensitivity=1,
-hour=12;
+let yaw=0;
+let pitch=-.12;
+let moveX=0;
+let moveY=0;
+let run=false;
+let fly=false;
+let vy=0;
+let grounded=true;
+let sensitivity=1;
+let hour=12;
 
 let audioCtx=null;
 let soundOn=true;
@@ -516,206 +2252,287 @@ let soundOn=true;
 
 function sound(type){
 
-if(!soundOn)return;
+  if(!soundOn) return;
 
-if(!audioCtx)
-audioCtx=new(
-window.AudioContext||
-window.webkitAudioContext
-)();
+  if(!audioCtx){
 
-if(audioCtx.state==='suspended')
-audioCtx.resume();
+    audioCtx =
+      new(
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
 
-const o=audioCtx.createOscillator();
-const g=audioCtx.createGain();
+  }
 
-const f=
-type==='jump'?520:
-type==='bird'?850:
-type==='water'?170:
-type==='help'?390:
-type==='teleport'?300:
-240;
+  if(
+    audioCtx.state === "suspended"
+  ){
 
-o.frequency.value=f;
-g.gain.value=.028;
+    audioCtx.resume();
 
-o.connect(g);
-g.connect(audioCtx.destination);
+  }
 
-o.start();
-o.stop(audioCtx.currentTime+.11);
+  const o =
+    audioCtx.createOscillator();
 
+  const g =
+    audioCtx.createGain();
+
+  const f =
+    type==="jump"
+      ? 520
+      : type==="bird"
+      ? 850
+      : type==="water"
+      ? 170
+      : type==="help"
+      ? 390
+      : type==="teleport"
+      ? 300
+      : 240;
+
+  o.frequency.value=f;
+
+  g.gain.value=.028;
+
+  o.connect(g);
+
+  g.connect(
+    audioCtx.destination
+  );
+
+  o.start();
+
+  o.stop(
+    audioCtx.currentTime+.11
+  );
 }
 
 
 function cameraUpdate(){
 
-const d=7;
+  const d=7;
 
-const target=new THREE.Vector3(
-player.position.x,
-2.1,
-player.position.z
-);
+  const target =
+    new THREE.Vector3(
+      player.position.x,
+      2.1,
+      player.position.z
+    );
 
-const off=new THREE.Vector3(
-Math.sin(yaw)*Math.cos(pitch)*d,
-Math.sin(pitch)*d+2.2,
-Math.cos(yaw)*Math.cos(pitch)*d
-);
+  const off =
+    new THREE.Vector3(
+      Math.sin(yaw)*
+      Math.cos(pitch)*d,
 
-camera.position.lerp(
-target.clone().add(off),
-.18
-);
+      Math.sin(pitch)*d+2.2,
 
-camera.lookAt(target);
+      Math.cos(yaw)*
+      Math.cos(pitch)*d
+    );
+
+  camera.position.lerp(
+    target.clone().add(off),
+    .18
+  );
+
+  camera.lookAt(target);
 
 }
 
 
 function move(dt){
 
-const speed=(run?10:5.5)*dt;
+  const speed =
+    (run ? 10 : 5.5)*dt;
 
-const f=new THREE.Vector3(
-Math.sin(yaw),
-0,
-Math.cos(yaw)
-);
+  const f =
+    new THREE.Vector3(
+      Math.sin(yaw),
+      0,
+      Math.cos(yaw)
+    );
 
-const r=new THREE.Vector3(
-f.z,
-0,
--f.x
-);
+  const r =
+    new THREE.Vector3(
+      f.z,
+      0,
+      -f.x
+    );
 
-const d=f.multiplyScalar(-moveY)
-.add(r.multiplyScalar(moveX));
+  const d =
+    f.multiplyScalar(-moveY)
+     .add(
+       r.multiplyScalar(moveX)
+     );
 
-if(d.length()>0){
+  if(
+    d.length()>0
+  ){
 
-d.normalize().multiplyScalar(speed);
+    d.normalize()
+     .multiplyScalar(speed);
 
-player.position.add(d);
+    player.position.add(d);
 
-player.rotation.y=
-Math.atan2(d.x,d.z);
+    player.rotation.y =
+      Math.atan2(
+        d.x,
+        d.z
+      );
+
+  }
+
+
+  if(fly){
+
+    player.position.y +=
+      (-moveY)*speed;
+
+    if(
+      Math.abs(moveX)>.15
+    ){
+
+      player.position.y +=
+        moveX*speed*.45;
+
+    }
+
+  }else{
+
+    vy -=
+      18*dt;
+
+    player.position.y +=
+      vy*dt;
+
+    if(
+      player.position.y<=0
+    ){
+
+      player.position.y=0;
+      vy=0;
+      grounded=true;
+
+    }
+
+  }
+
+  cameraUpdate();
 
 }
 
-if(fly){
 
-player.position.y+=(-moveY)*speed;
+const joy =
+  document.getElementById("joy");
 
-if(Math.abs(moveX)>.15)
-player.position.y+=moveX*speed*.45;
-
-}else{
-
-vy-=18*dt;
-
-player.position.y+=vy*dt;
-
-if(player.position.y<=0){
-
-player.position.y=0;
-vy=0;
-grounded=true;
-
-}
-
-}
-
-cameraUpdate();
-
-}
-
-
-const joy=document.getElementById('joy');
-const stick=document.getElementById('stick');
+const stick =
+  document.getElementById("stick");
 
 let jid=null;
 
 
 joy.addEventListener(
-'pointerdown',
-e=>{
-e.preventDefault();
-jid=e.pointerId;
-joy.setPointerCapture(jid);
-joyMove(e);
-}
+  "pointerdown",
+  e=>{
+    e.preventDefault();
+
+    jid=e.pointerId;
+
+    joy.setPointerCapture(jid);
+
+    joyMove(e);
+  }
+);
+
+
+joy.addEventListener(
+  "pointermove",
+  e=>{
+    if(
+      e.pointerId===jid
+    ){
+
+      joyMove(e);
+
+    }
+  }
+);
+
+
+joy.addEventListener(
+  "pointerup",
+  joyEnd
 );
 
 joy.addEventListener(
-'pointermove',
-e=>{
-if(e.pointerId===jid)
-joyMove(e);
-}
-);
-
-joy.addEventListener(
-'pointerup',
-joyEnd
-);
-
-joy.addEventListener(
-'pointercancel',
-joyEnd
+  "pointercancel",
+  joyEnd
 );
 
 
 function joyMove(t){
 
-const r=joy.getBoundingClientRect();
+  const r =
+    joy.getBoundingClientRect();
 
-const cx=r.left+r.width/2;
-const cy=r.top+r.height/2;
+  const cx =
+    r.left+r.width/2;
 
-const max=r.width*.34;
+  const cy =
+    r.top+r.height/2;
 
-let dx=t.clientX-cx;
-let dy=t.clientY-cy;
+  const max =
+    r.width*.34;
 
-let l=Math.hypot(dx,dy);
+  let dx =
+    t.clientX-cx;
 
-if(l>max){
+  let dy =
+    t.clientY-cy;
 
-dx*=max/l;
-dy*=max/l;
+  let l =
+    Math.hypot(
+      dx,
+      dy
+    );
 
-}
+  if(l>max){
 
-stick.style.left=
-`calc(50% + ${dx}px)`;
+    dx*=max/l;
+    dy*=max/l;
 
-stick.style.top=
-`calc(50% + ${dy}px)`;
+  }
 
-moveX=dx/max;
-moveY=dy/max;
+  stick.style.left =
+    `calc(50% + ${dx}px)`;
 
+  stick.style.top =
+    `calc(50% + ${dy}px)`;
+
+  moveX =
+    dx/max;
+
+  moveY =
+    dy/max;
 }
 
 
 function joyEnd(){
 
-jid=null;
+  jid=null;
 
-moveX=0;
-moveY=0;
+  moveX=0;
+  moveY=0;
 
-stick.style.left='50%';
-stick.style.top='50%';
+  stick.style.left="50%";
+  stick.style.top="50%";
 
 }
 
 
-const look=document.getElementById('look');
+const look =
+  document.getElementById("look");
 
 let lid=null;
 let lx=0;
@@ -723,1390 +2540,1799 @@ let ly=0;
 
 
 look.addEventListener(
-'pointerdown',
-e=>{
-lid=e.pointerId;
-lx=e.clientX;
-ly=e.clientY;
-look.setPointerCapture(lid);
-}
+  "pointerdown",
+  e=>{
+
+    lid=e.pointerId;
+
+    lx=e.clientX;
+    ly=e.clientY;
+
+    look.setPointerCapture(
+      lid
+    );
+
+  }
 );
 
 
 look.addEventListener(
-'pointermove',
-e=>{
+  "pointermove",
+  e=>{
 
-if(e.pointerId===lid){
+    if(
+      e.pointerId===lid
+    ){
 
-yaw-=
-(e.clientX-lx)*.006*sensitivity;
+      yaw -=
+        (e.clientX-lx)*
+        .006*
+        sensitivity;
 
-pitch-=
-(e.clientY-ly)*.0045*sensitivity;
+      pitch -=
+        (e.clientY-ly)*
+        .0045*
+        sensitivity;
 
-pitch=Math.max(
--.95,
-Math.min(.6,pitch)
-);
+      pitch =
+        Math.max(
+          -.95,
+          Math.min(
+            .6,
+            pitch
+          )
+        );
 
-lx=e.clientX;
-ly=e.clientY;
+      lx=e.clientX;
+      ly=e.clientY;
 
-}
+    }
 
-}
+  }
 );
 
 
 look.addEventListener(
-'pointerup',
-()=>lid=null
+  "pointerup",
+  ()=>{
+    lid=null;
+  }
 );
+
 
 look.addEventListener(
-'pointercancel',
-()=>lid=null
+  "pointercancel",
+  ()=>{
+    lid=null;
+  }
 );
 
 
-function press(id,fn){
+function press(
+  id,
+  fn
+){
 
-const b=document.getElementById(id);
+  const b =
+    document.getElementById(id);
 
-b.addEventListener(
-'pointerdown',
-e=>{
-e.preventDefault();
-fn();
-}
-);
+  b.addEventListener(
+    "pointerdown",
+    e=>{
+      e.preventDefault();
+      fn();
+    }
+  );
 
 }
 
 
 press(
-'jump',
-()=>{
-sound('jump');
+  "jump",
+  ()=>{
+    sound("jump");
 
-if(grounded&&!fly){
+    if(
+      grounded &&
+      !fly
+    ){
 
-vy=8;
-grounded=false;
+      vy=8;
+      grounded=false;
 
-}
-
-}
+    }
+  }
 );
 
 
 press(
-'fly',
-()=>{
+  "fly",
+  ()=>{
 
-fly=!fly;
+    fly=!fly;
 
-const b=document.getElementById('fly');
+    const b =
+      document.getElementById("fly");
 
-b.textContent=
-fly?'ATERRIZAR':'VOLAR';
+    b.textContent =
+      fly
+      ? "ATERRIZAR"
+      : "VOLAR";
 
-b.classList.toggle('on',fly);
+    b.classList.toggle(
+      "on",
+      fly
+    );
 
-toast(
-fly?
-'🪽 Modo vuelo activado':
-'🧍 Vuelo desactivado'
+    toast(
+      fly
+      ? "🪽 Modo vuelo activado"
+      : "🧍 Vuelo desactivado"
+    );
+
+    updateStatus();
+
+  }
 );
 
-updateStatus();
 
-}
-);
+const rb =
+  document.getElementById("run");
 
-
-const rb=document.getElementById('run');
 
 rb.addEventListener(
-'pointerdown',
-()=>{
-run=true;
-rb.classList.add('on');
-}
+  "pointerdown",
+  ()=>{
+    run=true;
+    rb.classList.add("on");
+  }
 );
 
-rb.addEventListener(
-'pointerup',
-()=>{
-run=false;
-rb.classList.remove('on');
-}
-);
 
 rb.addEventListener(
-'pointercancel',
-()=>{
-run=false;
-rb.classList.remove('on');
-}
+  "pointerup",
+  ()=>{
+    run=false;
+    rb.classList.remove("on");
+  }
+);
+
+
+rb.addEventListener(
+  "pointercancel",
+  ()=>{
+    run=false;
+    rb.classList.remove("on");
+  }
 );
 
 
 function toast(t){
 
-const el=document.getElementById('toast');
+  const el =
+    document.getElementById("toast");
 
-el.textContent=t;
-el.style.display='block';
+  el.textContent=t;
 
-clearTimeout(window.__toast);
+  el.style.display="block";
 
-window.__toast=setTimeout(
-()=>el.style.display='none',
-1700
-);
+  clearTimeout(
+    window.__toast
+  );
+
+  window.__toast =
+    setTimeout(
+      ()=>{
+        el.style.display="none";
+      },
+      1700
+    );
+
+}const panel=document.getElementById('panel'),
+mapPanel=document.getElementById('mapPanel'),
+spawnPanel=document.getElementById('spawnPanel');
+
+document.getElementById('gear').onclick=()=>{
+  panel.style.display=
+    panel.style.display==='block'
+    ?'none'
+    :'block';
+};
+
+document.getElementById('mapBtn').onclick=()=>{
+  mapPanel.classList.toggle('open');
+  drawMap();
+};
+
+document.getElementById('spawnBtn').onclick=()=>{
+  spawnPanel.classList.toggle('open');
+};
+
+
+function updateStatus(){
+
+  document.getElementById('status').textContent =
+    `Exploración • 360° • ${
+      hour<6 || hour>19 ? 'Noche' : 'Día'
+    } • ${
+      fly ? 'Volando' : 'A pie'
+    }`;
 
 }
 
 
-const panel=document.getElementById('panel');
-const mapPanel=document.getElementById('mapPanel');
-const spawnPanel=document.getElementById('spawnPanel');
+function updateTime(){
 
+  const a =
+    hour<12
+      ? 'AM'
+      : 'PM';
 
-document.getElementById('gear').onclick=()=>{
-panel.style.display=
-panel.style.display==='block'
-?'none'
-:'block';
-};
+  let h =
+    Math.floor(hour)%12;
 
+  if(h===0)h=12;
 
-document.getElementById('mapBtn').onclick=()=>{
-mapPanel.style.display=
-mapPanel.style.display==='block'
-?'none'
-:'block';
+  const m =
+    Math.floor(
+      (hour-Math.floor(hour))*60
+    )
+    .toString()
+    .padStart(2,'0');
 
-drawMap();
-};
+  document.getElementById('tv').textContent =
+    `${h}:${m} ${a}`;
 
+  const daylight =
+    Math.max(
+      0,
+      Math.sin(
+        ((hour-6)/12)*Math.PI
+      )
+    );
 
-document.getElementById('spawnBtn').onclick=()=>{
-spawnPanel.style.display=
-spawnPanel.style.display==='block'
-?'none'
-:'block';
-};
+  sun.intensity =
+    .25 + daylight*2.7;
+
+  hemi.intensity =
+    .35 + daylight*1.35;
+
+  const sky =
+    new THREE.Color();
+
+  sky.setHSL(
+    .56,
+    .55,
+    .20+.48*daylight
+  );
+
+  scene.background =
+    sky;
+
+  scene.fog.color =
+    sky;
+
+  updateStatus();
+
+}
 
 
 document.getElementById('size').oninput=e=>{
 
-const v=+e.target.value;
-const s=v/100;
+  const v =
+    +e.target.value;
 
-document.getElementById('sv').textContent=
-v+'%';
+  document.getElementById('sv').textContent =
+    v+'%';
 
-joy.style.transform=
-`scale(${s})`;
+  const scale =
+    v/100;
 
-document.getElementById('buttons').style.transform=
-`scale(${s})`;
+  document.getElementById('joy').style.transform =
+    `scale(${scale})`;
+
+  document.getElementById('buttons').style.transform =
+    `scale(${scale})`;
 
 };
 
 
 document.getElementById('sens').oninput=e=>{
 
-sensitivity=e.target.value/100;
+  sensitivity =
+    +e.target.value/100;
 
-document.getElementById('cv').textContent=
-e.target.value+'%';
+  document.getElementById('cv').textContent =
+    e.target.value+'%';
 
 };
 
 
-document.getElementById('quality').onchange=e=>{
+document.getElementById('time').oninput=e=>{
 
-renderer.setPixelRatio(
-Math.min(
-devicePixelRatio*+e.target.value,
-1.8
-)
-);
+  hour =
+    +e.target.value;
+
+  updateTime();
 
 };
 
 
 document.getElementById('sound').onchange=e=>{
-soundOn=e.target.checked;
-};
 
-
-document.getElementById('names').onchange=e=>{
-
-npcs.forEach(
-n=>n.userData.tag.visible=e.target.checked
-);
+  soundOn =
+    e.target.checked;
 
 };
 
 
 document.getElementById('shadows').onchange=e=>{
 
-renderer.shadowMap.enabled=e.target.checked;
-sun.castShadow=e.target.checked;
+  const on =
+    e.target.checked;
+
+  renderer.shadowMap.enabled =
+    on;
+
+  sun.castShadow =
+    on;
 
 };
 
 
-function setTime(h){
+document.getElementById('quality').onchange=e=>{
 
-hour=h;
+  renderer.setPixelRatio(
+    Math.min(
+      devicePixelRatio*
+      (+e.target.value),
+      2
+    )
+  );
 
-const a=
-h/24*Math.PI*2-Math.PI/2;
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
 
-const s=Math.max(
-0,
-Math.sin(a)
-);
-
-sun.position.set(
-Math.cos(a)*120,
-Math.sin(a)*120,
-45
-);
-
-sun.intensity=.18+s*3;
-
-hemi.intensity=.45+s*1.45;
-
-const sky=new THREE.Color();
-
-sky.lerpColors(
-new THREE.Color(0x071426),
-new THREE.Color(0x8acbf0),
-Math.min(1,s+.13)
-);
-
-scene.background.copy(sky);
-scene.fog.color.copy(sky);
-
-updateStatus();
-
-}
-
-
-function updateStatus(){
-
-document.getElementById('status').textContent=
-'Exploración • 360° • '+
-(hour>6&&hour<19?'Día':'Noche')+
-' • '+
-(fly?'Vuelo':'A pie')+
-' • '+
-(run?'Correr':'Caminar');
-
-}
-
-
-document.getElementById('time').oninput=e=>{
-
-const h=+e.target.value;
-
-document.getElementById('tv').textContent=
-String(Math.floor(h)).padStart(2,'0')+
-':'+
-String(
-Math.round(h%1*60)
-).padStart(2,'0');
-
-setTime(h);
+  toast(
+    '🎮 Calidad gráfica actualizada'
+  );
 
 };
 
-setTime(12);
 
+document.getElementById('names').onchange=e=>{
 
-const map=document.getElementById('map');
-const mc=map.getContext('2d');
+  npcs.forEach(n=>{
+
+    if(n.userData.tag){
+
+      n.userData.tag.visible =
+        e.target.checked;
+
+    }
+
+  });
+
+};
 
 
 function drawMap(){
 
-const w=
-map.width=
-Math.max(260,map.clientWidth*2);
+  const c =
+    document.getElementById('map');
 
-const h=
-map.height=
-Math.max(260,map.clientHeight*2);
+  if(!c)return;
 
-mc.clearRect(0,0,w,h);
+  const ctx =
+    c.getContext('2d');
 
-mc.fillStyle='#4d9c50';
-mc.fillRect(0,0,w,h);
+  const w =
+    c.width =
+      c.clientWidth*2;
 
-mc.fillStyle='#8e7960';
+  const h =
+    c.height =
+      c.clientHeight*2;
 
-mc.fillRect(
-w*.47,
-0,
-w*.06,
-h
+  ctx.clearRect(
+    0,
+    0,
+    w,
+    h
+  );
+
+  ctx.fillStyle =
+    '#285f39';
+
+  ctx.fillRect(
+    0,
+    0,
+    w,
+    h
+  );
+
+  function px(x,z){
+
+    return [
+      w/2+x/350*w*.92,
+      h/2+z/350*h*.92
+    ];
+
+  }
+
+
+  ctx.fillStyle =
+    '#258fca';
+
+  const lp =
+    px(
+      lake.position.x,
+      lake.position.z
+    );
+
+  ctx.beginPath();
+
+  ctx.arc(
+    lp[0],
+    lp[1],
+    42/350*w*.92,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    '#8e7960';
+
+  ctx.fillRect(
+    0,
+    h/2-7,
+    w,
+    14
+  );
+
+  ctx.fillRect(
+    w/2-9,
+    0,
+    18,
+    h
+  );
+
+
+  houses.forEach(house=>{
+
+    const p =
+      px(
+        house.position.x,
+        house.position.z
+      );
+
+    ctx.fillStyle =
+      '#e43b35';
+
+    ctx.beginPath();
+
+    ctx.arc(
+      p[0],
+      p[1],
+      7,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  });
+
+
+  buildings.forEach(b=>{
+
+    const p =
+      px(
+        b.position.x,
+        b.position.z
+      );
+
+    ctx.fillStyle =
+      '#ff8b2b';
+
+    ctx.fillRect(
+      p[0]-6,
+      p[1]-6,
+      12,
+      12
+    );
+
+  });
+
+
+  npcs.forEach(n=>{
+
+    const p =
+      px(
+        n.position.x,
+        n.position.z
+      );
+
+    ctx.fillStyle =
+      '#ffd447';
+
+    ctx.beginPath();
+
+    ctx.arc(
+      p[0],
+      p[1],
+      5,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  });
+
+
+  const pp =
+    px(
+      player.position.x,
+      player.position.z
+    );
+
+  ctx.fillStyle =
+    '#ffffff';
+
+  ctx.beginPath();
+
+  ctx.arc(
+    pp[0],
+    pp[1],
+    7,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+}
+
+
+document.getElementById('map')
+.addEventListener(
+  'pointerdown',
+  e=>{
+
+    const c =
+      e.currentTarget;
+
+    const r =
+      c.getBoundingClientRect();
+
+    const nx =
+      (e.clientX-r.left)/
+      r.width;
+
+    const nz =
+      (e.clientY-r.top)/
+      r.height;
+
+    player.position.x =
+      (nx-.5)*350;
+
+    player.position.z =
+      (nz-.5)*350;
+
+    player.position.y =
+      fly
+      ? Math.max(
+          player.position.y,
+          5
+        )
+      : 0;
+
+    sound('teleport');
+
+    toast(
+      '📍 Teletransportado'
+    );
+
+    mapPanel.classList.remove(
+      'open'
+    );
+
+  }
 );
 
-mc.fillRect(
-0,
-h*.46,
-w,
-h*.04
-);
 
-mc.fillStyle='#258fca';
+function showDialog(npc){
 
-mc.beginPath();
+  selectedNpc =
+    npc;
 
-mc.arc(
-w*.72,
-h*.27,
-w*.12,
-0,
-Math.PI*2
-);
+  const u =
+    npc.userData;
 
-mc.fill();
+  document.getElementById(
+    'dialogName'
+  ).textContent =
+    `${u.name} • ${u.job}`;
 
+  document.getElementById(
+    'dialogText'
+  ).textContent =
+    `${u.name}: ${u.need}`;
 
-houses
-.concat(buildings)
-.forEach(q=>{
+  document.getElementById(
+    'dialogAction'
+  ).textContent =
+    `Estado: ${u.mood} • Personalidad: ${u.personality}`;
 
-const x=
-w/2+
-q.position.x/300*w;
-
-const y=
-h/2+
-q.position.z/300*h;
-
-mc.fillStyle='#d34d3f';
-
-mc.fillRect(
-x-6,
-y-6,
-12,
-12
-);
-
-});
-
-
-npcs.forEach(q=>{
-
-const x=
-w/2+
-q.position.x/300*w;
-
-const y=
-h/2+
-q.position.z/300*h;
-
-mc.fillStyle='#f4d34e';
-
-mc.beginPath();
-
-mc.arc(
-x,
-y,
-5,
-0,
-7
-);
-
-mc.fill();
-
-});
-
-
-const px=
-w/2+
-player.position.x/300*w;
-
-const py=
-h/2+
-player.position.z/300*h;
-
-mc.fillStyle='#fff';
-
-mc.beginPath();
-
-mc.arc(
-px,
-py,
-7,
-0,
-7
-);
-
-mc.fill();
+  document.getElementById(
+    'dialog'
+  ).style.display =
+    'block';
 
 }
 
 
-map.addEventListener(
-'pointerdown',
-e=>{
+document.getElementById(
+  'closeDialog'
+).onclick=()=>{
 
-const r=
-map.getBoundingClientRect();
+  document.getElementById(
+    'dialog'
+  ).style.display =
+    'none';
 
-const nx=
-(e.clientX-r.left)/
-r.width-.5;
+};
 
-const nz=
-(e.clientY-r.top)/
-r.height-.5;
-
-player.position.x=
-nx*300;
-
-player.position.z=
-nz*300;
-
-player.position.y=
-fly?20:0;
-
-toast(
-'📍 Teletransporte realizado'
-);
-
-sound('teleport');
-
-drawMap();
-
-}
-);
-
-
-function openDialog(npc){
-
-selectedNpc=npc;
 
 document.getElementById(
-'dialogName'
-).textContent=
-'🧑 '+npc.userData.name;
+  'helpBtn'
+).onclick=()=>{
+
+  if(!selectedNpc)return;
+
+  pendingHelpNpc =
+    selectedNpc;
+
+  showHelpRequest(
+    selectedNpc
+  );
+
+};
+
 
 document.getElementById(
-'dialogText'
-).textContent=
-npc.userData.need;
+  'followBtn'
+).onclick=()=>{
 
-document.getElementById(
-'dialogAction'
-).textContent=
-npc.userData.helped
-?'✅ Ya ayudaste a esta persona.'
-:'Toca AYUDAR para aceptar la petición.';
+  if(!selectedNpc)return;
 
-document.getElementById(
-'dialog'
-).style.display='block';
+  selectedNpc.userData.following =
+    !selectedNpc.userData.following;
 
-if(!npc.userData.helped){
+  toast(
+    selectedNpc.userData.following
+      ? `🧭 ${selectedNpc.userData.name} te seguirá`
+      : `🧍 ${selectedNpc.userData.name} dejó de seguirte`
+  );
 
-pendingHelpNpc=npc;
-
-setTimeout(
-()=>showHelpRequest(npc),
-250
-);
-
-}
-
-}
+};
 
 
 function showHelpRequest(npc){
 
-pendingHelpNpc=npc;
+  pendingHelpNpc =
+    npc;
 
-document.getElementById(
-'helpNeed'
-).textContent=
-npc.userData.name+
-' dice: “'+
-npc.userData.need+
-'”';
+  document.getElementById(
+    'helpNeed'
+  ).textContent =
+    `${npc.userData.name} necesita ayuda: ${npc.userData.need}`;
 
-document.getElementById(
-'helpRequest'
-).classList.add('open');
+  document.getElementById(
+    'helpRequest'
+  ).classList.add(
+    'open'
+  );
 
-}
-
-
-function acceptHelp(npc){
-
-if(!npc)return;
-
-npc.userData.helped=true;
-
-document.getElementById(
-'dialog'
-).style.display='none';
-
-document.getElementById(
-'helpRequest'
-).classList.remove('open');
-
-document.getElementById(
-'questText'
-).textContent=
-'Petición aceptada de '+
-npc.userData.name+
-': '+
-npc.userData.need;
-
-toast(
-'✅ Ayuda aceptada • Sigue la situación'
-);
-
-sound('help');
-
-openChat(npc);
-
-addMessage(
-'system',
-'Petición aceptada. Puedes conversar con '+
-npc.userData.name+
-' para saber cómo resolverla.'
-);
+  sound('help');
 
 }
 
 
 function declineHelp(){
 
-document.getElementById(
-'helpRequest'
-).classList.remove('open');
+  if(pendingHelpNpc){
 
-toast('Petición rechazada');
+    pendingHelpNpc.userData.mood =
+      'decepcionado';
+
+  }
+
+  document.getElementById(
+    'helpRequest'
+  ).classList.remove(
+    'open'
+  );
+
+  toast(
+    '❌ Has rechazado ayudar'
+  );
+
+}
+
+
+function acceptHelp(){
+
+  if(!pendingHelpNpc)return;
+
+  const npc =
+    pendingHelpNpc;
+
+  npc.userData.helped =
+    true;
+
+  npc.userData.mood =
+    'agradecido';
+
+  npc.userData.need =
+    'Gracias por ayudarme.';
+
+  npc.userData.following =
+    true;
+
+  document.getElementById(
+    'helpRequest'
+  ).classList.remove(
+    'open'
+  );
+
+  document.getElementById(
+    'dialog'
+  ).style.display =
+    'none';
+
+  document.getElementById(
+    'questText'
+  ).textContent =
+    `✅ Ayudaste a ${npc.userData.name}. Ahora te acompaña.`;
+
+  sound('help');
+
+  toast(
+    `🤝 ${npc.userData.name} confía en ti`
+  );
 
 }
 
 
 document.getElementById(
-'closeDialog'
-).onclick=()=>{
-document.getElementById(
-'dialog'
-).style.display='none';
-};
-
+  'acceptHelp'
+).onclick =
+  acceptHelp;
 
 document.getElementById(
-'helpBtn'
-).onclick=()=>{
-if(!selectedNpc)return;
-acceptHelp(selectedNpc);
-};
-
-
-document.getElementById(
-'followBtn'
-).onclick=()=>{
-
-if(!selectedNpc)return;
-
-selectedNpc.userData.following=
-!selectedNpc.userData.following;
-
-toast(
-selectedNpc.userData.following
-?'🧭 Te seguirá por el mundo'
-:'👋 Dejó de seguirte'
-);
-
-};
-
-
-function addMessage(who,text){
-
-const box=
-document.getElementById(
-'chatMessages'
-);
-
-const d=
-document.createElement('div');
-
-d.className=
-'msg '+
-(
-who==='me'
-?'me'
-:
-who==='system'
-?'system'
-:'npc'
-);
-
-d.textContent=text;
-
-box.appendChild(d);
-
-box.scrollTop=
-box.scrollHeight;
-
-}
+  'declineHelp'
+).onclick =
+  declineHelp;
 
 
 function openChat(npc){
 
-chatNpc=npc;
+  chatNpc =
+    npc;
 
-document.getElementById(
-'chatName'
-).textContent=
-npc.userData.name;
+  document.getElementById(
+    'chatPanel'
+  ).classList.add(
+    'open'
+  );
 
-document.getElementById(
-'chatState'
-).textContent=
-npc.userData.job+
-' • '+
-npc.userData.mood;
+  document.getElementById(
+    'chatName'
+  ).textContent =
+    `${npc.userData.name} • ${npc.userData.job}`;
 
-document.getElementById(
-'chatMessages'
-).innerHTML='';
+  document.getElementById(
+    'chatAvatar'
+  ).textContent =
+    npc.userData.job==='médica'
+      ? '👩‍⚕️'
+      : npc.userData.job==='mecánico'
+      ? '👨‍🔧'
+      : npc.userData.job==='agricultor'
+      ? '👨‍🌾'
+      : npc.userData.job==='comerciante'
+      ? '🧑‍💼'
+      : '🧭';
 
-if(!npc.userData.chatHistory.length){
+  document.getElementById(
+    'chatState'
+  ).textContent =
+    `${npc.userData.mood} • ${npc.userData.personality}`;
 
-addMessage(
-'npc',
-npc.userData.need
-);
+  const box =
+    document.getElementById(
+      'chatMessages'
+    );
 
-addMessage(
-'npc',
-'Hola. Puedes preguntarme qué ocurre, qué necesito o dónde puedes ayudarme.'
-);
+  box.innerHTML =
+    '';
 
-}else{
+  if(
+    npc.userData.chatHistory.length===0
+  ){
 
-npc.userData.chatHistory.forEach(
-m=>addMessage(m.who,m.text)
-);
+    addMessage(
+      'npc',
+      `Hola, soy ${npc.userData.name}. ${npc.userData.need}`
+    );
 
-}
+  }else{
 
-document.getElementById(
-'chatPanel'
-).classList.add('open');
+    npc.userData.chatHistory.forEach(m=>{
 
-}
+      addMessage(
+        m.role==='user'
+          ? 'me'
+          : 'npc',
+        m.content
+      );
 
+    });
 
-function localAI(npc,input){
-
-const q=input.toLowerCase();
-const need=npc.userData.need.toLowerCase();
-
-if(
-q.includes('qué')&&
-q.includes('pasa')
-)
-return 'Ahora mismo mi problema es: '+
-npc.userData.need;
-
-if(
-q.includes('necesit')||
-q.includes('ayud')
-)
-return 'Lo que más necesito es '+
-npc.userData.need+
-' Si aceptas ayudarme, podemos ir paso a paso.';
-
-if(q.includes('dónde'))
-return 'Puedo indicarte el lugar cuando avancemos. Acércate a mí y te marcaré el objetivo en el mundo.';
-
-if(
-q.includes('quién')||
-q.includes('nombre')
-)
-return 'Soy '+
-npc.userData.name+
-'. Trabajo como '+
-npc.userData.job+
-' y soy '+
-npc.userData.personality+'.';
-
-if(q.includes('gracias'))
-return 'Gracias por escucharme. Tus decisiones pueden cambiar lo que ocurre en este mundo.';
-
-if(
-q.includes('sí')||
-q.includes('ayudar')
-)
-return 'Perfecto. Aceptaste mi petición. Sígueme o pregunta qué debemos hacer primero.';
-
-return 'Entiendo. Estoy '+
-npc.userData.mood+
-' y mi situación es: '+
-npc.userData.need+
-' ¿Quieres que te explique cómo puedes ayudarme?';
+  }
 
 }
 
 
-function buildAIPrompt(npc){
-
-return `Eres ${npc.userData.name}, un personaje persistente de un videojuego 3D llamado Mundo Vivo.
-
-Personalidad: ${npc.userData.personality}.
-
-Trabajo: ${npc.userData.job}.
-
-Estado emocional actual: ${npc.userData.mood}.
-
-Necesidad o misión actual: ${npc.userData.need}.
-
-El jugador puede ayudarte, conversar contigo y tomar decisiones.
-
-Responde en español, de forma natural y breve, como una persona del mundo.
-
-No digas que eres una IA ni menciones prompts.
-
-Mantén continuidad con la conversación.
-
-Si el jugador pregunta cómo ayudar, explica pasos concretos y coherentes con la misión.`;
-
-}
-
-
-async function callGenerativeAI(npc,input){
-
-if(!aiEndpoint)return null;
-
-const history=
-npc.userData.chatHistory
-.slice(-12)
-.map(m=>({
-role:
-m.who==='me'
-?'user'
-:'assistant',
-content:m.text
-}));
-
-
-const payload={
-
-npc:{
-name:npc.userData.name,
-job:npc.userData.job,
-mood:npc.userData.mood,
-need:npc.userData.need,
-personality:npc.userData.personality
-},
-
-system:buildAIPrompt(npc),
-
-messages:[
-...history,
-{
-role:'user',
-content:input
-}
-]
-
-};
-
-
-const controller=
-new AbortController();
-
-const timer=
-setTimeout(
-()=>controller.abort(),
-12000
-);
-
-
-try{
-
-const r=
-await fetch(
-aiEndpoint,
-{
-method:'POST',
-headers:{
-'Content-Type':
-'application/json'
-},
-body:
-JSON.stringify(payload),
-signal:controller.signal
-}
-);
-
-if(!r.ok)
-throw new Error(
-'HTTP '+r.status
-);
-
-const data=
-await r.json();
-
-const text=
-data.reply||
-data.text||
-data.output_text||
-data.output?.[0]?.content?.[0]?.text||
-data.choices?.[0]?.message?.content;
-
-if(text){
-
-aiOnline=true;
-
-document.getElementById(
-'aiState'
-).textContent=
-'Estado: 🟢 IA generativa conectada';
-
-return text;
-
-}
-
-throw new Error(
-'Respuesta IA vacía'
-);
-
-}catch(e){
-
-aiOnline=false;
-
-document.getElementById(
-'aiState'
-).textContent=
-'Estado: 🟡 IA local de respaldo';
-
-return null;
-
-}finally{
-
-clearTimeout(timer);
-
-}
-
-}
-
-
-async function sendChat(text){
-
-if(
-!chatNpc||
-!text.trim()||
-aiBusy
-)return;
-
-text=text.trim();
-
-addMessage(
-'me',
-text
-);
-
-chatNpc.userData.chatHistory.push({
-who:'me',
-text
-});
-
-aiBusy=true;
-
-addMessage(
-'system',
-'🧠 Pensando…'
-);
-
-const reply=
-await callGenerativeAI(
-chatNpc,
-text
-);
-
-const box=
-document.getElementById(
-'chatMessages'
-);
-
-if(
-box.lastElementChild?.classList.contains(
-'system'
-)
-)
-box.lastElementChild.remove();
-
-const finalReply=
-reply||
-localAI(
-chatNpc,
-text
-);
-
-addMessage(
-'npc',
-finalReply
-);
-
-chatNpc.userData.chatHistory.push({
-who:'npc',
-text:finalReply
-});
-
-aiBusy=false;
-
-}
-
-
-const ray=
-new THREE.Raycaster();
-
-const mouse=
-new THREE.Vector2();
-
-
-look.addEventListener(
-'pointerup',
-e=>{
-
-if(
-Math.hypot(
-e.clientX-(innerWidth*.5),
-e.clientY-(innerHeight*.5)
-)<20
-)return;
-
-mouse.x=
-e.clientX/innerWidth*2-1;
-
-mouse.y=
--(e.clientY/innerHeight)*2+1;
-
-ray.setFromCamera(
-mouse,
-camera
-);
-
-const hits=
-ray.intersectObjects(
-world.children,
-true
-);
-
-let obj=
-hits[0]?.object;
-
-while(
-obj&&
-obj.parent&&
-!obj.userData?.type
-)
-obj=obj.parent;
-
-if(
-obj?.userData?.type==='npc'
+function addMessage(
+  type,
+  text
 ){
 
-openDialog(obj);
+  const box =
+    document.getElementById(
+      'chatMessages'
+    );
 
-sound('bird');
+  const div =
+    document.createElement(
+      'div'
+    );
 
-}else if(
-obj?.userData?.enterable
+  div.className =
+    `msg ${type}`;
+
+  div.textContent =
+    text;
+
+  box.appendChild(
+    div
+  );
+
+  box.scrollTop =
+    box.scrollHeight;
+
+}
+
+
+function localAI(
+  npc,
+  input
 ){
 
-player.position.set(
-obj.position.x,
-0,
-obj.position.z+5
-);
+  const t =
+    input.toLowerCase();
 
-toast(
-'🏠 Entraste a '+
-(
-obj.userData.type==='building'
-?'el edificio'
-:'la casa'
-)
-);
+  const u =
+    npc.userData;
 
-sound('teleport');
+  if(
+    t.includes('nombre')
+  ){
 
-}
+    return `Me llamo ${u.name}. Soy ${u.job}.`;
 
-},
-{
-passive:true
-}
-);
+  }
 
+  if(
+    t.includes('necesit') ||
+    t.includes('ayuda') ||
+    t.includes('pasa')
+  ){
 
-function spawn(type){
+    return `${u.need} ${u.helped ? 'Gracias a ti ya estoy mucho mejor.' : 'Todavía necesito encontrar una solución.'}`;
 
-const x=
-player.position.x+
-Math.sin(yaw)*6;
+  }
 
-const z=
-player.position.z+
-Math.cos(yaw)*6;
+  if(
+    t.includes('dónde') ||
+    t.includes('donde')
+  ){
 
-let o;
+    return `Estoy cerca de ${Math.round(
+      npc.position.x
+    )}, ${Math.round(
+      npc.position.z
+    )}. Puedes venir conmigo.`;
 
-if(type==='house')
-o=house(
-x,z,.8,dynamic
-);
+  }
 
-if(type==='building')
-o=building(
-x,z,.7,dynamic
-);
+  if(
+    t.includes('trabajo') ||
+    t.includes('profes')
+  ){
 
-if(type==='tree')
-o=tree(
-x,z,.8,true,dynamic
-);
+    return `Trabajo como ${u.job}. Hoy ha sido un día ${u.mood}.`;
 
-if(type==='animal')
-o=animal(x,z);
+  }
 
-if(type==='car')
-o=car(x,z,.85);
+  if(
+    t.includes('hola') ||
+    t.includes('buenas')
+  ){
 
-if(type==='npc')
-o=person(
-'Habitante nuevo',
-x,
-z,
-0x2f78a5,
-'Estoy explorando este mundo. ¿Puedes ayudarme?'
-);
+    return `Hola. Me da gusto verte por aquí.`;
 
-if(type==='lake'){
+  }
 
-o=new THREE.Mesh(
-new THREE.CircleGeometry(13,48),
-waterMat
-);
+  if(
+    t.includes('gracias')
+  ){
 
-o.rotation.x=-Math.PI/2;
-o.position.set(x,.05,z);
+    return `De nada. Si necesitas algo, puedes hablar conmigo.`;
 
-dynamic.add(o);
+  }
 
-waterObjs.push(o);
+  const responses = [
 
-}
+    `Entiendo. Yo creo que podemos buscar una solución juntos.`,
 
-if(type==='bird'){
+    `Eso es interesante. El mundo está cambiando y hay mucho que descubrir.`,
 
-for(
-let i=0;
-i<5;
-i++
-)
-bird(
-x+(Math.random()-.5)*12,
-12+Math.random()*10,
-z+(Math.random()-.5)*12
-);
+    `No estoy completamente seguro, pero puedo acompañarte a investigar.`,
+
+    `Cuéntame un poco más y trataré de ayudarte.`
+
+  ];
+
+  return responses[
+    Math.floor(
+      Math.random()*responses.length
+    )
+  ];
 
 }
 
-spawnPanel.style.display='none';
 
-toast(
-'✨ '+
-({
-house:'Casa',
-building:'Edificio',
-tree:'Árbol',
-animal:'Animal',
-car:'Vehículo',
-npc:'Persona',
-lake:'Agua',
-bird:'Aves'
-}[type])+
-' creado'
-);
+function buildAIPrompt(
+  npc
+){
 
-sound('teleport');
+  const u =
+    npc.userData;
+
+  return `
+Eres ${u.name}, un personaje humano dentro del videojuego Mundo Vivo.
+
+Tu profesión es ${u.job}.
+Tu estado de ánimo actual es ${u.mood}.
+Tu personalidad es ${u.personality}.
+Tu necesidad actual es: ${u.need}.
+
+Habla en español natural y breve.
+No digas que eres una IA.
+No inventes poderes ni información que el juego no te haya dado.
+Puedes expresar emociones, necesidades, opiniones y reaccionar a las acciones del jugador.
+Si el jugador quiere ayudarte, explica de forma sencilla qué necesita hacer.
+Mantén las respuestas apropiadas para un videojuego familiar.
+`;
 
 }
+
+
+async function callGenerativeAI(
+  npc,
+  input
+){
+
+  try{
+
+    const messages =
+      npc.userData.chatHistory
+      .slice(-10)
+      .map(m=>({
+        role:m.role,
+        content:m.content
+      }));
+
+    const body={
+
+      npc:{
+        name:npc.userData.name,
+        job:npc.userData.job,
+        mood:npc.userData.mood,
+        need:npc.userData.need,
+        personality:npc.userData.personality
+      },
+
+      system:
+        buildAIPrompt(npc),
+
+      messages:[
+        ...messages,
+        {
+          role:'user',
+          content:input
+        }
+      ]
+
+    };
+
+
+    const response =
+      await fetch(
+        aiEndpoint,
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json'
+          },
+
+          body:
+            JSON.stringify(body)
+        }
+      );
+
+
+    if(!response.ok)
+      throw new Error(
+        'HTTP '+response.status
+      );
+
+
+    const data =
+      await response.json();
+
+
+    const reply =
+      data.reply ||
+      data.text ||
+      data.output_text ||
+      data.output?.[0]?.content?.[0]?.text ||
+      data.choices?.[0]?.message?.content;
+
+
+    if(!reply)
+      throw new Error(
+        'Respuesta IA vacía'
+      );
+
+
+    aiOnline =
+      true;
+
+    document.getElementById(
+      'aiState'
+    ).textContent =
+      'Estado: IA generativa conectada';
+
+    return reply;
+
+  }catch(err){
+
+    console.warn(
+      'IA generativa no disponible:',
+      err
+    );
+
+    aiOnline =
+      false;
+
+    document.getElementById(
+      'aiState'
+    ).textContent =
+      'Estado: IA local de respaldo';
+
+    return null;
+
+  }
+
+}
+
+
+async function sendChat(
+  input
+){
+
+  input =
+    String(input||'')
+    .trim();
+
+  if(
+    !input ||
+    !chatNpc ||
+    aiBusy
+  )
+    return;
+
+
+  const npc =
+    chatNpc;
+
+
+  addMessage(
+    'me',
+    input
+  );
+
+
+  npc.userData.chatHistory.push({
+
+    role:'user',
+
+    content:input
+
+  });
+
+
+  const thinking =
+    document.createElement(
+      'div'
+    );
+
+  thinking.className =
+    'msg npc';
+
+  thinking.textContent =
+    '🧠 Pensando…';
+
+  thinking.id =
+    'thinking';
+
+  document.getElementById(
+    'chatMessages'
+  ).appendChild(
+    thinking
+  );
+
+
+  aiBusy =
+    true;
+
+
+  let reply =
+    await callGenerativeAI(
+      npc,
+      input
+    );
+
+
+  if(!reply){
+
+    reply =
+      localAI(
+        npc,
+        input
+      );
+
+  }
+
+
+  const old =
+    document.getElementById(
+      'thinking'
+    );
+
+  if(old)
+    old.remove();
+
+
+  npc.userData.chatHistory.push({
+
+    role:'assistant',
+
+    content:reply
+
+  });
+
+
+  addMessage(
+    'npc',
+    reply
+  );
+
+
+  aiBusy =
+    false;
+
+}
+
+
+const raycaster =
+  new THREE.Raycaster();
+
+const pointer =
+  new THREE.Vector2();
+
+
+canvas.addEventListener(
+  'pointerdown',
+  e=>{
+
+    if(
+      e.target!==canvas
+    )
+      return;
+
+    pointer.x =
+      (e.clientX/
+       innerWidth)*2-1;
+
+    pointer.y =
+      -(e.clientY/
+        innerHeight)*2+1;
+
+
+    raycaster.setFromCamera(
+      pointer,
+      camera
+    );
+
+
+    const hits =
+      raycaster.intersectObjects(
+        world.children,
+        true
+      );
+
+
+    if(
+      !hits.length
+    )
+      return;
+
+
+    let obj =
+      hits[0].object;
+
+
+    while(
+      obj &&
+      obj.parent &&
+      !obj.userData?.type
+    ){
+
+      obj =
+        obj.parent;
+
+    }
+
+
+    if(
+      !obj ||
+      !obj.userData
+    )
+      return;
+
+
+    if(
+      obj.userData.type==='npc'
+    ){
+
+      showDialog(
+        obj
+      );
+
+      return;
+
+    }
+
+
+    if(
+      obj.userData.enterable
+    ){
+
+      player.position.set(
+        obj.position.x,
+        0,
+        obj.position.z+7
+      );
+
+      sound(
+        'teleport'
+      );
+
+      toast(
+        '🏠 Entraste a la zona de la casa'
+      );
+
+    }
+
+  }
+);
 
 
 document
-.querySelectorAll('[data-spawn]')
-.forEach(
-b=>b.addEventListener(
-'click',
-()=>spawn(b.dataset.spawn)
+.querySelectorAll(
+  '.spawnBtn'
 )
+.forEach(
+  b=>{
+
+    b.onclick=()=>{
+
+      const type =
+        b.dataset.spawn;
+
+      const x =
+        player.position.x +
+        Math.sin(yaw)*6;
+
+      const z =
+        player.position.z +
+        Math.cos(yaw)*6;
+
+
+      if(
+        type==='house'
+      ){
+
+        houses.push(
+          house(
+            x,
+            z,
+            .8,
+            dynamic
+          )
+        );
+
+        toast(
+          '🏠 Casa creada'
+        );
+
+      }
+
+
+      else if(
+        type==='building'
+      ){
+
+        buildings.push(
+          building(
+            x,
+            z,
+            .65,
+            dynamic
+          )
+        );
+
+        toast(
+          '🏢 Edificio creado'
+        );
+
+      }
+
+
+      else if(
+        type==='tree'
+      ){
+
+        tree(
+          x,
+          z,
+          1,
+          true,
+          dynamic
+        );
+
+        toast(
+          '🌳 Árbol creado'
+        );
+
+      }
+
+
+      else if(
+        type==='animal'
+      ){
+
+        animal(
+          x,
+          z
+        );
+
+        toast(
+          '🐕 Animal creado'
+        );
+
+      }
+
+
+      else if(
+        type==='car'
+      ){
+
+        car(
+          x,
+          z,
+          .8
+        );
+
+        toast(
+          '🚗 Vehículo creado'
+        );
+
+      }
+
+
+      else if(
+        type==='npc'
+      ){
+
+        person(
+          'Nuevo habitante',
+          x,
+          z,
+          0x4678b8,
+          'Necesito conocer este mundo.'
+        );
+
+        toast(
+          '🧑 Nuevo personaje creado'
+        );
+
+      }
+
+
+      else if(
+        type==='lake'
+      ){
+
+        const w =
+          new THREE.Mesh(
+            new THREE.CircleGeometry(
+              12,
+              40
+            ),
+            waterMat.clone()
+          );
+
+        w.rotation.x =
+          -Math.PI/2;
+
+        w.position.set(
+          x,
+          .06,
+          z
+        );
+
+        dynamic.add(w);
+
+        waterObjs.push(
+          w
+        );
+
+        toast(
+          '🌊 Agua creada'
+        );
+
+      }
+
+
+      else if(
+        type==='bird'
+      ){
+
+        for(
+          let i=0;
+          i<5;
+          i++
+        ){
+
+          bird(
+            x+
+              (Math.random()-.5)*15,
+            12+
+              Math.random()*10,
+            z+
+              (Math.random()-.5)*15
+          );
+
+        }
+
+        toast(
+          '🐦 Aves creadas'
+        );
+
+      }
+
+
+      spawnPanel.classList.remove(
+        'open'
+      );
+
+    };
+
+  }
 );
 
 
 document.getElementById(
-'acceptHelp'
-).onclick=
-()=>acceptHelp(
-pendingHelpNpc
-);
-
-
-document.getElementById(
-'declineHelp'
-).onclick=
-declineHelp;
-
-
-document.getElementById(
-'chatBtn'
+  'chatBtn'
 ).onclick=()=>{
 
-if(chatNpc)
-openChat(chatNpc);
+  if(chatNpc)
+    openChat(
+      chatNpc
+    );
 
-else if(selectedNpc)
-openChat(selectedNpc);
+  else if(selectedNpc)
+    openChat(
+      selectedNpc
+    );
 
-else
-toast(
-'Toca primero a un personaje'
-);
+  else
+    toast(
+      'Toca primero a un personaje'
+    );
 
 };
 
 
 document.getElementById(
-'closeChat'
+  'closeChat'
 ).onclick=()=>{
-document.getElementById(
-'chatPanel'
-).classList.remove('open');
+  document
+    .getElementById(
+      'chatPanel'
+    )
+    .classList.remove(
+      'open'
+    );
 };
 
 
 document.getElementById(
-'chatForm'
+  'chatForm'
 ).addEventListener(
-'submit',
-e=>{
+  'submit',
+  e=>{
 
-e.preventDefault();
+    e.preventDefault();
 
-const i=
-document.getElementById(
-'chatInput'
-);
+    const i =
+      document.getElementById(
+        'chatInput'
+      );
 
-sendChat(i.value);
+    sendChat(
+      i.value
+    );
 
-i.value='';
+    i.value='';
 
-}
+  }
 );
 
 
 document
-.querySelectorAll('.quick')
+.querySelectorAll(
+  '.quick'
+)
 .forEach(
-b=>b.onclick=
-()=>sendChat(
-b.dataset.q
-)
+  b=>{
+
+    b.onclick=()=>{
+
+      sendChat(
+        b.dataset.q
+      );
+
+    };
+
+  }
 );
 
 
 document.getElementById(
-'appBtn'
+  'appBtn'
 ).onclick=()=>{
-document.getElementById(
-'appPanel'
-).classList.toggle('open');
+
+  document.getElementById(
+    'appPanel'
+  ).classList.toggle(
+    'open'
+  );
+
 };
 
 
 document.getElementById(
-'fullscreenApp'
+  'fullscreenApp'
 ).onclick=()=>{
+
+  if(
+    document.documentElement
+      .requestFullscreen
+  ){
+
+    document.documentElement
+      .requestFullscreen();
+
+  }else{
+
+    toast(
+      'Usa el modo pantalla completa del navegador'
+    );
+
+  }
+
+};
+
+
+document.getElementById(
+  'installApp'
+).onclick=()=>{
+
+  if(
+    deferredInstall
+  ){
+
+    deferredInstall.prompt();
+
+    deferredInstall.userChoice
+      .finally(
+        ()=>{
+          deferredInstall=null;
+        }
+      );
+
+  }else{
+
+    toast(
+      'En iPhone: Compartir → Añadir a pantalla de inicio'
+    );
+
+  }
+
+};
+
+
+document.getElementById(
+  'aiSettingsBtn'
+).onclick=()=>{
+
+  const p =
+    document.getElementById(
+      'aiSettings'
+    );
+
+  p.style.display =
+    p.style.display==='none'
+      ?'block'
+      :'none';
+
+  document.getElementById(
+    'aiEndpoint'
+  ).value =
+    aiEndpoint;
+
+};
+
+
+document.getElementById(
+  'saveAI'
+).onclick=()=>{
+
+  aiEndpoint =
+    document.getElementById(
+      'aiEndpoint'
+    ).value
+    .trim() ||
+    AI_DEFAULT_ENDPOINT;
+
+  localStorage.setItem(
+    'mundoVivoAIEndpoint',
+    aiEndpoint
+  );
+
+  document.getElementById(
+    'aiState'
+  ).textContent =
+    'Estado: endpoint guardado';
+
+  toast(
+    '🧠 Configuración de IA guardada'
+  );
+
+};
+
+
+document.getElementById(
+  'testAI'
+).onclick=async()=>{
+
+  if(!chatNpc){
+
+    toast(
+      'Toca primero a un personaje'
+    );
+
+    return;
+
+  }
+
+  addMessage(
+    'system',
+    '🧪 Probando conexión con la IA…'
+  );
+
+  const r =
+    await callGenerativeAI(
+      chatNpc,
+      'Preséntate brevemente y dime qué está pasando ahora.'
+    );
+
+  if(r)
+    addMessage(
+      'npc',
+      r
+    );
+
+  else
+    addMessage(
+      'system',
+      'No respondió el servidor. Se usará la IA local.'
+    );
+
+};
+
+
+document.getElementById(
+  'aiEndpoint'
+).value =
+  aiEndpoint;
+
 
 if(
-document.documentElement.requestFullscreen
-)
-document.documentElement.requestFullscreen();
-
-else
-toast(
-'Usa el modo pantalla completa del navegador'
-);
-
-};
-
-
-document.getElementById(
-'installApp'
-).onclick=()=>{
-
-if(deferredInstall){
-
-deferredInstall.prompt();
-
-deferredInstall.userChoice.finally(
-()=>deferredInstall=null
-);
-
-}else{
-
-toast(
-'En iPhone: Compartir → Añadir a pantalla de inicio'
-);
-
-}
-
-};
-
-
-document.getElementById(
-'aiSettingsBtn'
-).onclick=()=>{
-
-const p=
-document.getElementById(
-'aiSettings'
-);
-
-p.style.display=
-p.style.display==='none'
-?'block'
-:'none';
-
-document.getElementById(
-'aiEndpoint'
-).value=
-aiEndpoint;
-
-};
-
-
-document.getElementById(
-'saveAI'
-).onclick=()=>{
-
-aiEndpoint=
-document.getElementById(
-'aiEndpoint'
-).value.trim()||
-AI_DEFAULT_ENDPOINT;
-
-localStorage.setItem(
-'mundoVivoAIEndpoint',
-aiEndpoint
-);
-
-document.getElementById(
-'aiState'
-).textContent=
-'Estado: endpoint guardado';
-
-toast(
-'🧠 Configuración de IA guardada'
-);
-
-};
-
-
-document.getElementById(
-'testAI'
-).onclick=
-async()=>{
-
-if(!chatNpc){
-
-toast(
-'Toca primero a un personaje'
-);
-
-return;
-
-}
-
-addMessage(
-'system',
-'🧪 Probando conexión con la IA…'
-);
-
-const r=
-await callGenerativeAI(
-chatNpc,
-'Preséntate brevemente y dime qué está pasando ahora.'
-);
-
-if(r)
-addMessage(
-'npc',
-r
-);
-
-else
-addMessage(
-'system',
-'No respondió el servidor. Se usará la IA local.'
-);
-
-};
-
-
-document.getElementById(
-'aiEndpoint'
-).value=
-aiEndpoint;
-
-
-if(
-'serviceWorker' in navigator
+  'serviceWorker' in navigator
 ){
 
-navigator.serviceWorker
-.register('./sw.js')
-.catch(()=>{});
+  navigator.serviceWorker
+    .register(
+      './sw.js'
+    )
+    .catch(
+      ()=>{}
+    );
 
 }
 
 
 window.addEventListener(
-'beforeinstallprompt',
-e=>{
+  'beforeinstallprompt',
+  e=>{
 
-e.preventDefault();
+    e.preventDefault();
 
-deferredInstall=e;
+    deferredInstall =
+      e;
 
-document.getElementById(
-'installApp'
-).textContent=
-'📲 Instalar Mundo Vivo';
+    document.getElementById(
+      'installApp'
+    ).textContent =
+      '📲 Instalar Mundo Vivo';
 
-}
+  }
 );
 
 
@@ -2114,340 +4340,401 @@ let situation=0;
 
 
 setInterval(
-()=>{
+  ()=>{
 
-if(!npcs.length)return;
+    if(
+      !npcs.length
+    )
+      return;
 
-situation++;
 
-const q=
-npcs[
-situation%npcs.length
-];
+    situation++;
 
-const needs=[
 
-'Necesito agua para mi familia.',
+    const q =
+      npcs[
+        situation%npcs.length
+      ];
 
-'¿Puedes ayudarme a encontrar mi animal?',
 
-'Hay un animal en peligro cerca del lago.',
+    const needs=[
 
-'Necesitamos comida y medicinas.',
+      'Necesito agua para mi familia.',
 
-'Mi vehículo necesita combustible.',
+      '¿Puedes ayudarme a encontrar mi animal?',
 
-'Mi casa tiene un problema y necesito ayuda.'
+      'Hay un animal en peligro cerca del lago.',
 
-];
+      'Necesitamos comida y medicinas.',
 
-q.userData.need=
-needs[
-situation%needs.length
-];
+      'Mi vehículo necesita combustible.',
 
-q.userData.helped=false;
+      'Mi casa tiene un problema y necesito ayuda.'
 
-if(
-Math.random()<.75
-)
-showHelpRequest(q);
+    ];
 
-document.getElementById(
-'questText'
-).textContent=
-q.userData.name+
-' necesita ayuda: '+
-q.userData.need;
 
-document.getElementById(
-'quest'
-).style.display='block';
+    q.userData.need =
+      needs[
+        situation%needs.length
+      ];
 
-sound('bird');
+    q.userData.helped =
+      false;
 
-},
-14000
+
+    if(
+      Math.random()<.75
+    )
+      showHelpRequest(
+        q
+      );
+
+
+    document.getElementById(
+      'questText'
+    ).textContent =
+      q.userData.name+
+      ' necesita ayuda: '+
+      q.userData.need;
+
+
+    document.getElementById(
+      'quest'
+    ).style.display =
+      'block';
+
+
+    sound(
+      'bird'
+    );
+
+  },
+  14000
 );
 
 
 addEventListener(
-'resize',
-()=>{
+  'resize',
+  ()=>{
 
-camera.aspect=
-innerWidth/innerHeight;
+    camera.aspect =
+      innerWidth/
+      innerHeight;
 
-camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
-renderer.setSize(
-innerWidth,
-innerHeight
+    renderer.setSize(
+      innerWidth,
+      innerHeight
+    );
+
+    drawMap();
+
+  }
 );
 
+
 drawMap();
+
+updateTime();
+
+cameraUpdate();
+
+
+let prev =
+  performance.now();
+
+
+function animate(
+  now
+){
+
+  requestAnimationFrame(
+    animate
+  );
+
+
+  const dt =
+    Math.min(
+      (now-prev)/1000,
+      .04
+    );
+
+  prev =
+    now;
+
+
+  move(
+    dt
+  );
+
+
+  birds.forEach(
+    (b,i)=>{
+
+      b.position.x +=
+        Math.sin(
+          now*.00035+
+          b.userData.phase
+        )*
+        dt*
+        6;
+
+      b.position.z +=
+        dt*
+        3.5;
+
+      b.position.y +=
+        Math.sin(
+          now*.0018+i
+        )*
+        dt*
+        .8;
+
+
+      b.children[1]
+        .rotation.z =
+          Math.sin(
+            now*.012+i
+          )*
+          .45;
+
+      b.children[2]
+        .rotation.z =
+          -Math.sin(
+            now*.012+i
+          )*
+          .45;
+
+
+      if(
+        b.position.z>330
+      )
+        b.position.z=
+          -330;
+
+    }
+  );
+
+
+  clouds.forEach(
+    (c,i)=>{
+
+      c.position.x +=
+        dt*
+        (1+i*.06);
+
+      if(
+        c.position.x>330
+      )
+        c.position.x=
+          -330;
+
+    }
+  );
+
+
+  animals.forEach(
+    (a,i)=>{
+
+      a.position.x +=
+        Math.sin(
+          now*.0004+i
+        )*
+        dt*
+        a.userData.speed;
+
+      a.position.z +=
+        Math.cos(
+          now*.00032+i
+        )*
+        dt*
+        a.userData.speed*
+        .6;
+
+      a.rotation.y =
+        Math.sin(
+          now*.0005+i
+        )*
+        .5;
+
+    }
+  );
+
+
+  cars.forEach(
+    (c,i)=>{
+
+      c.position.z +=
+        dt*
+        c.userData.speed;
+
+      if(
+        c.position.z>220
+      )
+        c.position.z=
+          -220;
+
+    }
+  );
+
+
+  npcs.forEach(
+    (p,i)=>{
+
+      const u =
+        p.userData;
+
+      let moving =
+        false;
+
+
+      if(
+        u.following
+      ){
+
+        const target =
+          player.position.clone();
+
+        target.y=0;
+
+        const d =
+          target.sub(
+            p.position
+          );
+
+
+        if(
+          d.length()>3
+        ){
+
+          d.normalize()
+           .multiplyScalar(
+             dt*1.2
+           );
+
+          p.position.add(
+            d
+          );
+
+          p.rotation.y =
+            Math.atan2(
+              d.x,
+              d.z
+            );
+
+          moving=true;
+
+        }
+
+      }else{
+
+        const dx =
+          Math.sin(
+            now*.00035+i
+          )*
+          dt*
+          .15;
+
+        p.position.x +=
+          dx;
+
+        p.rotation.y =
+          Math.sin(
+            now*.0007+i
+          )*
+          .15;
+
+        moving =
+          Math.abs(dx)>.0002;
+
+      }
+
+
+      u.walkPhase +=
+        moving
+          ? dt*8
+          : dt*2;
+
+
+      const sw =
+        Math.sin(
+          u.walkPhase
+        )*
+        .45;
+
+
+      u.armL.rotation.x =
+        sw;
+
+      u.armR.rotation.x =
+        -sw;
+
+      u.legL.rotation.x =
+        -sw;
+
+      u.legR.rotation.x =
+        sw;
+
+    }
+  );
+
+
+  waterObjs.forEach(
+    (w,i)=>{
+
+      w.position.y =
+        .05+
+        Math.sin(
+          now*.0018+i
+        )*
+        .025;
+
+      w.material.opacity =
+        .78+
+        .08*
+        Math.sin(
+          now*.0012+i
+        );
+
+    }
+  );
+
+
+  document.getElementById(
+    'compass'
+  ).textContent =
+    'N '+
+    (
+      (
+        yaw*180/Math.PI
+      )%360+
+      360
+    )%360
+    .toFixed(0)+
+    '°';
+
+
+  renderer.render(
+    scene,
+    camera
+  );
 
 }
-);
 
 
-drawMap();
-
-
-let prev=performance.now();
-
-
-function animate(now){
+window.hideMundoLoader();
 
 requestAnimationFrame(
-animate
-);
-
-const dt=
-Math.min(
-(now-prev)/1000,
-.04
-);
-
-prev=now;
-
-move(dt);
-
-
-birds.forEach(
-(b,i)=>{
-
-b.position.x+=
-Math.sin(
-now*.00035+
-b.userData.phase
-)*
-dt*
-6;
-
-b.position.z+=
-dt*3.5;
-
-b.position.y+=
-Math.sin(
-now*.0018+i
-)*
-dt*.8;
-
-b.children[1].rotation.z=
-Math.sin(
-now*.012+i
-)*.45;
-
-b.children[2].rotation.z=
--Math.sin(
-now*.012+i
-)*.45;
-
-if(
-b.position.z>330
-)
-b.position.z=-330;
-
-}
-);
-
-
-clouds.forEach(
-(c,i)=>{
-
-c.position.x+=
-dt*(1+i*.06);
-
-if(
-c.position.x>330
-)
-c.position.x=-330;
-
-}
-);
-
-
-animals.forEach(
-(a,i)=>{
-
-a.position.x+=
-Math.sin(
-now*.0004+i
-)*
-dt*
-a.userData.speed;
-
-a.position.z+=
-Math.cos(
-now*.00032+i
-)*
-dt*
-a.userData.speed*
-.6;
-
-a.rotation.y=
-Math.sin(
-now*.0005+i
-)*.5;
-
-}
-);
-
-
-cars.forEach(
-(c,i)=>{
-
-c.position.z+=
-dt*
-c.userData.speed;
-
-if(
-c.position.z>220
-)
-c.position.z=-220;
-
-}
-);
-
-
-npcs.forEach(
-(p,i)=>{
-
-const u=p.userData;
-
-let moving=false;
-
-
-if(u.following){
-
-const target=
-player.position.clone();
-
-target.y=0;
-
-const d=
-target.sub(p.position);
-
-if(d.length()>3){
-
-d.normalize()
-.multiplyScalar(
-dt*1.2
-);
-
-p.position.add(d);
-
-p.rotation.y=
-Math.atan2(
-d.x,
-d.z
-);
-
-moving=true;
-
-}
-
-}else{
-
-const dx=
-Math.sin(
-now*.00035+i
-)*
-dt*
-.15;
-
-p.position.x+=dx;
-
-p.rotation.y=
-Math.sin(
-now*.0007+i
-)*.15;
-
-moving=
-Math.abs(dx)>.0002;
-
-}
-
-
-u.walkPhase+=
-moving
-?dt*8
-:dt*2;
-
-const sw=
-Math.sin(
-u.walkPhase
-)*.45;
-
-u.armL.rotation.x=sw;
-u.armR.rotation.x=-sw;
-
-u.legL.rotation.x=-sw;
-u.legR.rotation.x=sw;
-
-}
-);
-
-
-waterObjs.forEach(
-(w,i)=>{
-
-w.position.y=
-.05+
-Math.sin(
-now*.0018+i
-)*.025;
-
-w.material.opacity=
-.78+
-.08*
-Math.sin(
-now*.0012+i
-);
-
-}
-);
-
-
-document.getElementById(
-'compass'
-).textContent=
-'N '+
-(
-(
-yaw*180/Math.PI%360+
-360
-)%360
-).toFixed(0)+
-'°';
-
-
-drawMap();
-
-renderer.render(
-scene,
-camera
-);
-
-}
-
-
-document.getElementById(
-'loading'
-).classList.add(
-'loadingHide'
-);
-
-requestAnimationFrame(
-animate
+  animate
 );
 
 }
 
 </script>
 
-<!-- V15: La IA generativa se conecta mediante un backend seguro configurado en /api/chat. -->
+<!-- V15.1: IA generativa mediante backend seguro configurado en /api/chat. -->
 
 </body>
 </html>
