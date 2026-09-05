@@ -4738,3 +4738,726 @@ requestAnimationFrame(
 
 </body>
 </html>
+<style>
+#life17{
+position:fixed;z-index:45;left:50%;top:50%;
+transform:translate(-50%,-50%);
+width:min(430px,calc(100vw - 20px));
+max-height:82vh;overflow:auto;
+background:rgba(7,14,22,.97);color:#fff;
+border:1px solid #ffffff22;border-radius:20px;
+padding:15px;box-shadow:0 20px 70px #000b;
+backdrop-filter:blur(18px);display:none
+}
+#life17.open{display:block}
+.l17grid{
+display:grid;grid-template-columns:1fr 1fr;
+gap:7px;margin-top:10px
+}
+.l17btn{
+border:1px solid #ffffff20;
+background:#ffffff10;color:#fff;
+border-radius:11px;padding:10px 6px;
+font-weight:850;font-size:11px
+}
+.l17btn.on{background:#2f9e63}
+.l17stats{
+display:grid;grid-template-columns:1fr 1fr;
+gap:6px;margin-top:10px
+}
+.l17stat{
+padding:8px;border-radius:10px;
+background:#ffffff08;
+border:1px solid #ffffff12;
+font-size:10px
+}
+.l17log{
+max-height:220px;overflow:auto;
+margin-top:9px;
+border-top:1px solid #ffffff16;
+padding-top:6px;
+touch-action:pan-y
+}
+.l17line{
+font-size:10px;line-height:1.35;
+padding:7px 2px;
+border-bottom:1px solid #ffffff0d
+}
+.l17bar{
+height:5px;background:#ffffff12;
+border-radius:5px;overflow:hidden;
+margin-top:4px
+}
+.l17bar i{
+display:block;height:100%;
+background:#fff;border-radius:5px
+}
+.l17mini{
+font-size:10px;opacity:.68;margin-top:7px
+}
+</style>
+
+<button id="life17Open" class="topbtn"
+style="position:fixed;right:12px;top:232px;z-index:32">
+🌍
+</button>
+
+<div id="life17">
+
+<div style="display:flex;align-items:center;gap:8px">
+
+<div style="font-size:23px">🌎</div>
+
+<div style="flex:1">
+<b style="font-size:17px">Vida del mundo V17</b>
+
+<div class="small">
+Necesidades • dinero • memoria • relaciones • familias
+</div>
+
+</div>
+
+<button id="life17Close"
+class="topbtn"
+style="width:37px;height:37px">
+×
+</button>
+
+</div>
+
+<div class="l17grid">
+
+<button class="l17btn" id="l17Heal">
+❤️ Sanar
+</button>
+
+<button class="l17btn" id="l17Food">
+🍎 Dar comida
+</button>
+
+<button class="l17btn" id="l17God">
+⚡ Modo Dios
+</button>
+
+<button class="l17btn" id="l17Earth">
+🌋 Terremoto
+</button>
+
+<button class="l17btn" id="l17Sun">
+☀️ Sol
+</button>
+
+<button class="l17btn" id="l17Moon">
+🌙 Luna
+</button>
+
+<button class="l17btn" id="l17Rain">
+🌧️ Lluvia
+</button>
+
+<button class="l17btn" id="l17Storm">
+⛈️ Tormenta
+</button>
+
+<button class="l17btn" id="l17Snow">
+❄️ Nieve
+</button>
+
+<button class="l17btn" id="l17Clear">
+🌤️ Despejado
+</button>
+
+<button class="l17btn" id="l17Social">
+💬 Social
+</button>
+
+<button class="l17btn" id="l17Families">
+👨‍👩‍👧 Familias
+</button>
+
+</div>
+
+<div id="l17Stats" class="l17stats"></div>
+
+<div class="l17mini">
+Selecciona una persona para conversar; sus recuerdos se conservan en su memoria de juego.
+</div>
+
+<div id="l17Log" class="l17log"></div>
+
+</div>// ===== MUNDO VIVO V17 =====
+
+const life17=document.getElementById('life17');
+const life17Log=document.getElementById('l17Log');
+const life17Stats=document.getElementById('l17Stats');
+
+let life17God=false;
+let life17Social=true;
+let life17Families=true;
+let life17LastSocial=0;
+let life17LastStats=0;
+
+function lifeOf(n){
+
+ const u=n.userData;
+
+ u.life=u.life||{
+   health:100,
+   hunger:100,
+   thirst:100,
+   energy:100,
+   money:100,
+   age:u.child?1:18+Math.floor(Math.random()*38),
+   relations:{},
+   family:u.family||null,
+   children:[],
+   memory:[]
+ };
+
+ return u.life;
+}
+
+function life17LogAdd(a,b,t){
+
+ const tm=new Date().toLocaleTimeString(
+ 'es-MX',
+ {hour:'2-digit',minute:'2-digit'}
+ );
+
+ socialEntries.unshift({
+   time:tm,
+   a:a,
+   b:b,
+   text:t
+ });
+
+ socialEntries=socialEntries.slice(0,100);
+
+ life17Log.innerHTML=socialEntries.map(x=>
+ '<div class="l17line">'+
+ '<b>'+x.a+'</b> ↔ <b>'+x.b+'</b><br>'+
+ x.text+
+ '<div style="opacity:.5">'+x.time+'</div>'+
+ '</div>'
+ ).join('');
+}
+
+function life17Mem(n,text){
+
+ const l=lifeOf(n);
+
+ l.memory.push({
+   t:Date.now(),
+   text:text
+ });
+
+ if(l.memory.length>20)
+   l.memory.shift();
+
+ n.userData.lastMemory=text;
+}
+
+function life17Mood(n){
+
+ const l=lifeOf(n);
+
+ if(l.health<25)
+   n.userData.mood='enfermo';
+
+ else if(l.hunger<20 || l.thirst<20)
+   n.userData.mood='hambriento';
+
+ else if(l.energy<18)
+   n.userData.mood='cansado';
+
+ else if(
+   n.userData.mood==='enfermo' ||
+   n.userData.mood==='hambriento' ||
+   n.userData.mood==='cansado'
+ )
+   n.userData.mood='tranquilo';
+}
+
+function life17Heal(n){
+
+ const l=lifeOf(n);
+
+ l.health=100;
+
+ n.userData.mood='feliz';
+
+ life17Mem(
+   n,
+   'El jugador me ayudó a recuperar mi salud.'
+ );
+}
+
+function life17Feed(n){
+
+ const l=lifeOf(n);
+
+ l.hunger=100;
+ l.thirst=Math.min(100,l.thirst+45);
+
+ n.userData.mood='satisfecho';
+
+ life17Mem(
+   n,
+   'El jugador me dio comida y agua.'
+ );
+}
+
+function life17All(fn){
+
+ npcs.forEach(fn);
+
+ toast(
+   '🌍 Poder aplicado a todos los habitantes'
+ );
+}
+
+function life17StatsDraw(){
+
+ if(!npcs.length)return;
+
+ let sel=selectedNpc||npcs[0];
+
+ let l=lifeOf(sel);
+
+ const avg=k=>
+ Math.round(
+   npcs.reduce(
+     (a,n)=>a+lifeOf(n)[k],
+     0
+   )/npcs.length
+ );
+
+ life17Stats.innerHTML=
+
+ '<div class="l17stat">'+
+ '<b>👤 '+sel.userData.name+'</b><br>'+
+ 'Trabajo: '+sel.userData.job+
+ '<br>Dinero: $'+Math.round(l.money)+
+ '<br>Edad: '+Math.floor(l.age)+' años'+
+ '</div>'+
+
+ '<div class="l17stat">'+
+ '<b>🌎 Población</b><br>'+
+ 'Habitantes: '+npcs.length+
+ '<br>Salud: '+avg('health')+'%'+
+ '<br>Dinero medio: $'+avg('money')+
+ '</div>'+
+
+ [
+  'health',
+  'hunger',
+  'thirst',
+  'energy'
+ ].map((k,i)=>
+
+ '<div class="l17stat">'+
+ [
+  '❤️ Salud',
+  '🍎 Hambre',
+  '💧 Sed',
+  '⚡ Energía'
+ ][i]+
+ ' '+Math.round(l[k])+'%'+
+ '<div class="l17bar">'+
+ '<i style="width:'+
+ Math.max(0,Math.min(100,l[k]))+
+ '%"></i>'+
+ '</div>'+
+ '</div>'
+
+ ).join('');
+}
+
+function life17SocialPair(){
+
+ if(!life17Social || npcs.length<2)
+   return;
+
+ let a=npcs[
+   Math.floor(Math.random()*npcs.length)
+ ];
+
+ let near=npcs.filter(n=>
+   n!==a &&
+   a.position.distanceTo(n.position)<14
+ );
+
+ let b=near.length
+   ?near[Math.floor(Math.random()*near.length)]
+   :npcs[Math.floor(Math.random()*npcs.length)];
+
+ if(!b || b===a)
+   return;
+
+ const al=lifeOf(a);
+ const bl=lifeOf(b);
+
+ const topics=[
+   '¿Cómo estás?',
+   '¿Necesitas comida o agua?',
+   '¿Cómo va tu trabajo?',
+   'Me gusta vivir aquí.',
+   '¿Has visto al jugador?',
+   'Podemos ayudarnos.',
+   'El clima está cambiando.'
+ ];
+
+ let t=topics[
+   Math.floor(Math.random()*topics.length)
+ ];
+
+ if(al.hunger<20)
+   t='Tengo mucha hambre, ¿conoces un lugar para comer?';
+
+ else if(bl.thirst<20)
+   t='Necesito agua antes de seguir trabajando.';
+
+ al.relations[b.userData.name]=
+ Math.min(
+   100,
+   (al.relations[b.userData.name]||0)+2
+ );
+
+ bl.relations[a.userData.name]=
+ Math.min(
+   100,
+   (bl.relations[a.userData.name]||0)+2
+ );
+
+ life17Mem(
+   a,
+   'Hablé con '+b.userData.name+': '+t
+ );
+
+ life17Mem(
+   b,
+   'Hablé con '+a.userData.name+': '+t
+ );
+
+ a.userData.mood='sociable';
+ b.userData.mood='sociable';
+
+ bubble(a,t);
+ bubble(b,'Sí, estoy de acuerdo.');
+
+ life17LogAdd(
+   a.userData.name,
+   b.userData.name,
+   t+' — Sí, estoy de acuerdo.'
+ );
+}
+
+function life17Family(){
+
+ if(!life17Families || npcs.length>=70)
+   return;
+
+ let pool=npcs.filter(n=>{
+
+   const l=lifeOf(n);
+
+   return(
+     l.age>=20 &&
+     l.age<=50 &&
+     !n.userData.child
+   );
+
+ });
+
+ for(let i=0;i<pool.length;i++){
+
+   let a=pool[i];
+
+   let near=pool.find(
+     b=>
+     b!==a &&
+     a.position.distanceTo(b.position)<8
+   );
+
+   if(!near)
+     continue;
+
+   let al=lifeOf(a);
+   let bl=lifeOf(near);
+
+   let score=
+     (al.relations[near.userData.name]||0)+
+     (bl.relations[a.userData.name]||0);
+
+   if(score<8 || Math.random()>.08)
+     continue;
+
+   const fam=
+     al.family ||
+     bl.family ||
+     ('Familia '+Math.floor(Math.random()*9000+1000));
+
+   const name=
+     'Nuevo habitante '+(npcs.length+1);
+
+   const child=person(
+     name,
+     (a.position.x+near.position.x)/2+1,
+     (a.position.z+near.position.z)/2+1,
+     0x5c78bd,
+     'Quiero conocer el mundo y aprender de mi familia.'
+   );
+
+   const cl=lifeOf(child);
+
+   cl.age=1;
+   cl.family=fam;
+
+   child.userData.child=true;
+   child.userData.family=fam;
+   child.userData.parents=[
+     a.userData.name,
+     near.userData.name
+   ];
+
+   child.userData.job='estudiante';
+
+   al.family=fam;
+   bl.family=fam;
+
+   al.children.push(name);
+   bl.children.push(name);
+
+   life17LogAdd(
+     a.userData.name,
+     near.userData.name,
+     'Formaron una familia y llegó '+name+
+     ' como nuevo integrante.'
+   );
+
+   bubble(
+     a,
+     '¡Llegó un nuevo integrante a nuestra familia!'
+   );
+
+   break;
+ }
+}
+
+function life17Event(dt){
+
+ npcs.forEach(n=>{
+
+   const l=lifeOf(n);
+
+   if(life17God){
+
+     l.health=100;
+     l.hunger=100;
+     l.thirst=100;
+     l.energy=100;
+     l.money=Math.max(l.money,100);
+
+   }else{
+
+     l.hunger=Math.max(
+       0,
+       l.hunger-dt*.10
+     );
+
+     l.thirst=Math.max(
+       0,
+       l.thirst-dt*.14
+     );
+
+     l.energy=Math.max(
+       0,
+       l.energy-dt*.055
+     );
+
+     if(l.hunger<18 || l.thirst<18)
+       l.health=Math.max(
+         1,
+         l.health-dt*.035
+       );
+
+     if(
+       l.energy<8 &&
+       Math.random()<.03
+     ){
+
+       l.energy=Math.min(
+         100,
+         l.energy+12
+       );
+
+       l.mood='durmiendo';
+     }
+
+     if(
+       l.energy>75 &&
+       l.mood==='durmiendo'
+     )
+       l.mood='tranquilo';
+
+   }
+
+   if(
+     n.userData.job &&
+     n.userData.job!=='habitante' &&
+     Math.random()<dt*.004
+   )
+     l.money+=2;
+
+   life17Mood(n);
+
+ });
+
+ if(
+   performance.now()-life17LastSocial>6500
+ ){
+
+   life17LastSocial=performance.now();
+
+   life17SocialPair();
+ }
+
+ if(
+   performance.now()-life17LastStats>1500
+ ){
+
+   life17LastStats=performance.now();
+
+   life17StatsDraw();
+ }
+}document.getElementById('life17Open').onclick=()=>{
+ life17.classList.add('open');
+ life17StatsDraw();
+};
+
+document.getElementById('life17Close').onclick=()=>{
+ life17.classList.remove('open');
+};
+
+document.getElementById('l17Heal').onclick=()=>{
+
+ if(selectedNpc)
+   life17Heal(selectedNpc);
+ else
+   life17All(life17Heal);
+
+};
+
+document.getElementById('l17Food').onclick=()=>{
+
+ if(selectedNpc)
+   life17Feed(selectedNpc);
+ else
+   life17All(life17Feed);
+
+};
+
+document.getElementById('l17God').onclick=()=>{
+
+ life17God=!life17God;
+
+ document
+ .getElementById('l17God')
+ .classList.toggle('on',life17God);
+
+ toast(
+   life17God
+   ?'⚡ MODO DIOS ACTIVADO'
+   :'⚡ Modo Dios desactivado'
+ );
+};
+
+document.getElementById('l17Earth').onclick=()=>{
+ earthquake();
+ toast('🌋 Terremoto provocado');
+};
+
+document.getElementById('l17Sun').onclick=()=>{
+
+ hour=12;
+
+ setWeather('clear');
+
+ updateTime();
+
+ toast('☀️ Sol en lo alto');
+};
+
+document.getElementById('l17Moon').onclick=()=>{
+
+ hour=23;
+
+ setWeather('clear');
+
+ updateTime();
+
+ toast('🌙 Luna visible');
+};
+
+document.getElementById('l17Rain').onclick=()=>{
+ setWeather('rain');
+};
+
+document.getElementById('l17Storm').onclick=()=>{
+ setWeather('storm');
+};
+
+document.getElementById('l17Snow').onclick=()=>{
+ setWeather('snow');
+};
+
+document.getElementById('l17Clear').onclick=()=>{
+
+ setWeather('clear');
+
+ toast('🌤️ Despejado');
+};
+
+document.getElementById('l17Social').onclick=()=>{
+
+ life17Social=!life17Social;
+
+ document
+ .getElementById('l17Social')
+ .classList.toggle('on',life17Social);
+
+ toast(
+   life17Social
+   ?'💬 Conversaciones automáticas activadas'
+   :'💬 Conversaciones pausadas'
+ );
+};
+
+document.getElementById('l17Families').onclick=()=>{
+
+ life17Families=!life17Families;
+
+ document
+ .getElementById('l17Families')
+ .classList.toggle('on',life17Families);
+
+ toast(
+   life17Families
+   ?'👨‍👩‍👧 Crecimiento familiar activado'
+   :'👨‍👩‍👧 Crecimiento familiar pausado'
+ );
+};
+
+npcs.forEach(n=>{
+ lifeOf(n);
+});
+
+setInterval(()=>{
+ life17Family();
+},12000);
+
+setInterval(()=>{
+ life17Event(.5);
+},500);
+
+toast('🌎 Mundo Vivo V17 listo');
