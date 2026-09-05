@@ -2,236 +2,600 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Mundo Vivo 3D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Mundo Vivo 3D v2</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#87ceeb;font-family:Arial,sans-serif;touch-action:none}
 #game{position:fixed;inset:0}
-#hud{position:fixed;top:10px;left:10px;right:10px;z-index:5;color:white;background:#07131dcc;border-radius:15px;padding:10px;font-size:13px;backdrop-filter:blur(7px)}
-#hud b{color:#7fffd4}
-#joy{position:fixed;left:22px;bottom:35px;width:145px;height:145px;border-radius:50%;background:#ffffff26;border:2px solid #ffffff66;z-index:10}
-#stick{position:absolute;left:42px;top:42px;width:61px;height:61px;border-radius:50%;background:#fff9;border:2px solid white}
-#run{position:fixed;right:25px;bottom:55px;width:85px;height:85px;border-radius:50%;z-index:10;border:2px solid white;background:#07131dcc;color:white;font-size:30px;font-weight:bold}
-#help{position:fixed;right:15px;top:100px;z-index:5;background:#07131dcc;color:white;border:0;border-radius:12px;padding:8px 12px}
-#msg{position:fixed;left:50%;bottom:145px;transform:translateX(-50%);z-index:20;background:#000c;color:white;padding:9px 15px;border-radius:18px;display:none}
+#hud{position:fixed;top:10px;left:10px;right:10px;z-index:10;color:#fff;background:rgba(10,18,28,.78);padding:12px 14px;border-radius:16px;backdrop-filter:blur(8px);font-size:14px;line-height:1.45}
+#hud .title{font-size:20px;font-weight:800;color:#7fffd4;margin-bottom:3px}
+#hud b{color:#fff}
+#help{position:fixed;right:12px;top:105px;z-index:12;border:0;border-radius:14px;padding:11px 14px;background:#fff;color:#16202a;font-weight:800;box-shadow:0 4px 14px #0005}
+#joystick{position:fixed;left:25px;bottom:38px;width:150px;height:150px;border:4px solid #ffffffaa;border-radius:50%;background:#ffffff25;z-index:20}
+#stick{position:absolute;left:50%;top:50%;width:62px;height:62px;transform:translate(-50%,-50%);border:4px solid #fff;border-radius:50%;background:#dfe6edcc}
+#cameraHint{position:fixed;right:25px;bottom:55px;width:145px;height:145px;border-radius:50%;z-index:19;background:#111c2a55;border:3px solid #ffffff88;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:13px;padding:25px}
+#run{position:fixed;right:28px;bottom:215px;z-index:20;width:78px;height:78px;border:0;border-radius:50%;background:#fff;color:#17202a;font-size:30px;font-weight:900;box-shadow:0 4px 14px #0005}
+#actions{position:fixed;left:50%;transform:translateX(-50%);bottom:15px;z-index:21;display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:90%}
+#actions button{border:0;border-radius:13px;padding:10px 12px;background:#fff;color:#18222c;font-weight:800;box-shadow:0 3px 12px #0004}
+#msg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;background:#101923ee;color:#fff;padding:15px 20px;border-radius:16px;font-weight:800;display:none;text-align:center}
+.stat{display:inline-block;margin-right:12px}
+.good{color:#7fffd4}
+.warn{color:#ffd166}
+.bad{color:#ff7b7b}
+
+#customPanel{
+position:fixed;right:12px;top:145px;width:230px;z-index:40;
+background:rgba(9,17,27,.94);color:#fff;padding:14px;border-radius:16px;
+box-shadow:0 8px 30px #0008;display:none
+}
+#customPanel .customTitle{font-size:16px;font-weight:900;color:#7fffd4;margin-bottom:10px}
+#customPanel label{display:block;margin:9px 0;font-size:13px}
+#customPanel select,#customPanel input{width:100%;margin-top:4px}
+#customPanel button{width:100%;border:0;border-radius:10px;padding:9px;margin-top:7px;font-weight:800}
+
 </style>
 </head>
 <body>
 <div id="game"></div>
 
 <div id="hud">
-<b>ð MUNDO VIVO 3D</b><br>
-ð¤ TÃ &nbsp; â¤ï¸ <span id="salud">100</span>% &nbsp; ð <span id="comida">10</span>
-&nbsp; ð§ <span id="agua">10</span><br>
-ð¥ Habitantes: <span id="people">80</span> &nbsp; ð  Casas: <span id="houses">0</span>
-&nbsp; ð Autos: <span id="cars">0</span> &nbsp; ð Animales: <span id="animals">0</span>
+  <div class="title">MUNDO VIVO 3D v2</div>
+  <span class="stat">TU salud: <b id="health">100</b>%</span>
+  <span class="stat">Comida: <b id="food">10</b></span>
+  <span class="stat">Agua: <b id="water">10</b></span>
+  <br>
+  Habitantes: <b id="people">60</b> &nbsp; Casas: <b id="houses">0</b> &nbsp; Autos: <b id="cars">0</b> &nbsp; Animales: <b id="animals">0</b>
+  <br>
+  <span id="status" class="good">Listo para explorar</span>
 </div>
 
-<button id="help">ð® CÃ³mo jugar</button>
-<div id="joy"><div id="stick"></div></div>
-<button id="run">ð</button>
+<button id="help">Como jugar</button>
+<div id="joystick"><div id="stick"></div></div>
+<button id="run">RUN</button>
+<div id="cameraHint">Arrastra aqui para mover la camara</div>
+
+<div id="actions">
+  <button id="heal">Sanar</button>
+  <button id="give">Dar comida</button>
+  <button id="enterCar">Subir al auto</button>
+  <button id="exitCar">Bajar</button>
+  <button id="day">Dia/Noche</button><button id="custom">Personaje</button>
+  <button id="sound">ð Sonido</button><button id="reset">Reiniciar</button>
+</div>
+
+<div id="customPanel">
+  <div class="customTitle">PERSONALIZAR PERSONAJE</div>
+  <label>Sexo
+    <select id="cSex"><option value="hombre">Hombre</option><option value="mujer">Mujer</option></select>
+  </label>
+  <label>Cabello
+    <select id="cHair"><option value="negro">Negro</option><option value="castano">CastaÃ±o</option><option value="rubio">Rubio</option><option value="pelirrojo">Pelirrojo</option></select>
+  </label>
+  <label>Piel <input id="cSkin" type="range" min="0" max="2" value="1"></label>
+  <label>Camisa <input id="cShirt" type="color" value="#2466b1"></label>
+  <label>PantalÃ³n <input id="cPants" type="color" value="#20242a"></label>
+  <label>Altura <input id="cHeight" type="range" min="0.85" max="1.15" step="0.01" value="1"></label>
+  <button id="applyCustom">Aplicar cambios</button>
+  <button id="closeCustom">Cerrar</button>
+</div>
+
 <div id="msg"></div>
 
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
 </script>
 
 <script type="module">
 import * as THREE from "three";
 
+const game=document.getElementById("game");
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x82cfff);
-scene.fog=new THREE.Fog(0x82cfff,55,260);
+scene.background=new THREE.Color(0x87ceeb);
+scene.fog=new THREE.Fog(0x87ceeb,90,420);
 
-const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,700);
+camera.position.set(0,7,10);
+
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=true;
-document.getElementById("game").appendChild(renderer.domElement);
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+game.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xbfe9ff,0x52734d,2.1));
-const sun=new THREE.DirectionalLight(0xffffff,2.3);
-sun.position.set(70,100,50); sun.castShadow=true; scene.add(sun);
+const hemi=new THREE.HemisphereLight(0xbfe9ff,0x49623c,2.2);
+scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,2.7);
+sun.position.set(80,130,60);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-160; sun.shadow.camera.right=160;
+sun.shadow.camera.top=160; sun.shadow.camera.bottom=-160;
+scene.add(sun);
 
 const clock=new THREE.Clock();
-const people=[],cars=[],animals=[];
-let running=false;
-let joyX=0,joyY=0;
-let day=0;
+const people=[],cars=[],animals=[],houses=[];
+let player, playerHealth=100, food=10, water=10;
+let running=false, inCar=false, night=false;
+let yaw=0, pitch=.18;
+let joyX=0,joyY=0,joyActive=false;
+let camTouch=null;
+const keys={};
 
-function box(w,h,d,color){
- const m=new THREE.MeshStandardMaterial({color});
- const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
- o.castShadow=o.receiveShadow=true; return o;
+function mat(color,rough=.9){
+  return new THREE.MeshStandardMaterial({color,roughness:rough});
 }
-function cyl(r,h,color){
- const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,12),new THREE.MeshStandardMaterial({color}));
- o.castShadow=o.receiveShadow=true; return o;
+function box(w,h,d,color,x=0,y=h/2,z=0){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));
+  m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true; scene.add(m); return m;
 }
-function tree(x,z,s=1){
- const g=new THREE.Group();
- const trunk=cyl(.28,2.2,0x70452d); trunk.position.y=1.1; g.add(trunk);
- const crown=new THREE.Mesh(new THREE.SphereGeometry(1.45,12,10),new THREE.MeshStandardMaterial({color:0x27823a}));
- crown.position.y=2.7; crown.castShadow=true; g.add(crown);
- g.position.set(x,0,z); g.scale.setScalar(s); scene.add(g);
+function cyl(r,h,color,x=0,y=h/2,z=0){
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,16),mat(color));
+  m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true; scene.add(m); return m;
 }
-function house(x,z){
- const g=new THREE.Group();
- const body=box(6,3.5,6,0xe9d6b2); body.position.y=1.75; g.add(body);
- const roof=new THREE.Mesh(new THREE.ConeGeometry(4.7,2.2,4),new THREE.MeshStandardMaterial({color:0x8e3e31}));
- roof.rotation.y=Math.PI/4; roof.position.y=4.6; roof.scale.z=.72; g.add(roof);
- const door=box(1.1,2,.12,0x5a3826); door.position.set(0,1,-3.05); g.add(door);
- const win=box(1.2,1.1,.12,0x6bbce5); win.position.set(-2,2,-3.08); g.add(win);
- g.position.set(x,0,z); scene.add(g);
-}
-function road(x,z,w,d){
- const r=box(w,.08,d,0x3f4348); r.position.set(x,.03,z); scene.add(r);
-}
-function person(x,z){
- const g=new THREE.Group();
- const body=box(.65,1.25,.45,0x2366a8); body.position.y=1.35; g.add(body);
- const head=new THREE.Mesh(new THREE.SphereGeometry(.34,12,10),new THREE.MeshStandardMaterial({color:0xf0bf98}));
- head.position.y=2.25; g.add(head);
- const l=box(.18,.9,.18,0x222222), r=l.clone();
- l.position.set(-.18,.45,0); r.position.set(.18,.45,0); g.add(l,r);
- g.position.set(x,0,z); scene.add(g); people.push(g);
-}
-function car(x,z){
- const g=new THREE.Group();
- const base=box(2.2,.65,4,0x20252a); base.position.y=.55; g.add(base);
- const top=box(1.65,.55,2,0x65c5e8); top.position.y=1.05; g.add(top);
- g.position.set(x,.0,z); scene.add(g); cars.push(g);
-}
-function dog(x,z){
- const g=new THREE.Group();
- const b=box(.75,.55,1.1,0x9b693e); b.position.y=.55; g.add(b);
- const h=new THREE.Mesh(new THREE.SphereGeometry(.38,10,8),new THREE.MeshStandardMaterial({color:0xb07b4b}));
- h.position.set(0,.75,-.65); g.add(h);
- g.position.set(x,0,z); scene.add(g); animals.push(g);
+function sphere(r,color,x=0,y=r,z=0){
+  const m=new THREE.Mesh(new THREE.SphereGeometry(r,18,14),mat(color));
+  m.position.set(x,y,z); m.castShadow=true; scene.add(m); return m;
 }
 
-/* ciudad */
-const ground=box(260,.2,260,0x69a953); ground.position.y=-.1; ground.receiveShadow=true; scene.add(ground);
-road(0,0,14,260); road(0,0,260,14);
-for(let x=-110;x<=110;x+=22) for(let z=-110;z<=110;z+=22){
- if(Math.abs(x)<14||Math.abs(z)<14) continue;
- house(x,z);
+function makeGround(){
+  box(420,.3,420,0x5f9f52,0,-.15,0);
+  box(18,.08,420,0x3d4650,-45,.04,0);
+  box(18,.08,420,0x3d4650,45,.04,0);
+  box(420,.08,18,0x3d4650,0,.04,-45);
+  box(420,.08,18,0x3d4650,0,.04,45);
+  for(let i=-180;i<=180;i+=18){
+    box(1,.03,7,0xf2f2d0,0,.12,i);
+    box(7,.03,1,0xf2f2d0,i,.12,0);
+  }
 }
-for(let i=0;i<150;i++){
- let x=(Math.random()*240)-120, z=(Math.random()*240)-120;
- if(Math.abs(x)<12||Math.abs(z)<12) continue;
- tree(x,z,.65+Math.random()*.6);
+makeGround();
+
+function makeHouse(x,z){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.BoxGeometry(11,5,9),mat(0xe8d5b5));
+  base.position.y=2.5; base.castShadow=true; g.add(base);
+  const roof=new THREE.Mesh(new THREE.ConeGeometry(7.5,4,4),mat(0x9d463b));
+  roof.rotation.y=Math.PI/4; roof.position.y=7; roof.castShadow=true; g.add(roof);
+  const door=new THREE.Mesh(new THREE.BoxGeometry(1.4,2.8,.15),mat(0x5b3926));
+  door.position.set(0,1.4,4.56); g.add(door);
+  for(const sx of [-3,3]){
+    const win=new THREE.Mesh(new THREE.BoxGeometry(1.8,1.6,.12),mat(0x75c9e8));
+    win.position.set(sx,2.6,4.57); g.add(win);
+  }
+  g.position.set(x,0,z);
+  scene.add(g); houses.push(g);
 }
-for(let i=0;i<80;i++) person((Math.random()*220)-110,(Math.random()*220)-110);
-for(let i=0;i<14;i++) car((Math.random()*200)-100,(Math.random()*200)-100);
-for(let i=0;i<25;i++) dog((Math.random()*220)-110,(Math.random()*220)-110);
-
-/* jugador */
-const player=new THREE.Group();
-const pb=box(.72,1.35,.5,0x174ea6); pb.position.y=1.35; player.add(pb);
-const ph=new THREE.Mesh(new THREE.SphereGeometry(.38,16,12),new THREE.MeshStandardMaterial({color:0xffc9a6}));
-ph.position.y=2.35; player.add(ph);
-const leg1=box(.2,.95,.2,0x222222),leg2=leg1.clone();
-leg1.position.set(-.2,.45,0);leg2.position.set(.2,.45,0);player.add(leg1,leg2);
-player.position.set(0,0,20);
-scene.add(player);
-
-let camAngle=0;
-let camDistance=7;
-let targetCam=new THREE.Vector3();
-
-function move(){
- const speed=(running?0.16:0.085);
- const f=new THREE.Vector3(Math.sin(camAngle),0,Math.cos(camAngle));
- const right=new THREE.Vector3(Math.cos(camAngle),0,-Math.sin(camAngle));
- const dir=new THREE.Vector3();
- dir.addScaledVector(f,-joyY).addScaledVector(right,joyX);
- if(dir.lengthSq()>.01){
-   dir.normalize();
-   player.position.addScaledVector(dir,speed);
-   player.rotation.y=Math.atan2(dir.x,dir.z);
- }
- player.position.x=THREE.MathUtils.clamp(player.position.x,-125,125);
- player.position.z=THREE.MathUtils.clamp(player.position.z,-125,125);
+for(let x=-135;x<=135;x+=27){
+  for(let z=-135;z<=135;z+=27){
+    if(Math.abs(x)<55 && Math.abs(z)<55) continue;
+    makeHouse(x+(Math.random()-.5)*6,z+(Math.random()-.5)*6);
+  }
 }
 
-function updateCamera(){
- targetCam.set(
-   player.position.x-Math.sin(camAngle)*camDistance,
-   player.position.y+4.2,
-   player.position.z-Math.cos(camAngle)*camDistance
- );
- camera.position.lerp(targetCam,.12);
- const look=new THREE.Vector3(player.position.x,player.position.y+1.5,player.position.z);
- camera.lookAt(look);
+function makeTree(x,z){
+  const g=new THREE.Group();
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.45,.6,3,10),mat(0x70452a));
+  trunk.position.y=1.5; trunk.castShadow=true; g.add(trunk);
+  const crown=new THREE.Mesh(new THREE.SphereGeometry(2.6,16,12),mat(0x2f8c46));
+  crown.position.y=4.3; crown.castShadow=true; g.add(crown);
+  g.position.set(x,0,z); scene.add(g);
+}
+for(let i=0;i<90;i++){
+  const x=(Math.random()*360)-180, z=(Math.random()*360)-180;
+  if(Math.abs(x)<60 || Math.abs(z)<60) makeTree(x,z);
 }
 
-let dragging=false,lastX=0;
-renderer.domElement.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX});
-renderer.domElement.addEventListener("pointermove",e=>{
- if(dragging){camAngle-=(e.clientX-lastX)*.006;lastX=e.clientX}
+function human(x,z,playerFlag=false){
+  const g=new THREE.Group();
+  const skin=[0xd7a67c,0xf0c3a0,0xb9794f][Math.floor(Math.random()*3)];
+  const shirt=[0x2457a6,0x2d7b50,0x8d3b5e,0x7c5c24][Math.floor(Math.random()*4)];
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.58,20,16),mat(skin));
+  head.position.y=3.15; head.castShadow=true; g.add(head);
+  const body=new THREE.Mesh(new THREE.BoxGeometry(1.15,1.55,.65),mat(shirt));
+  body.position.y=2; body.castShadow=true; g.add(body);
+  const leg1=new THREE.Mesh(new THREE.BoxGeometry(.28,1.3,.32),mat(0x20242a));
+  const leg2=leg1.clone();
+  leg1.position.set(-.28,.65,0); leg2.position.set(.28,.65,0);
+  leg1.castShadow=leg2.castShadow=true; g.add(leg1,leg2);
+  if(playerFlag){
+    const ring=new THREE.Mesh(new THREE.RingGeometry(.75,.9,24),new THREE.MeshBasicMaterial({color:0x7fffd4,side:THREE.DoubleSide}));
+    ring.rotation.x=-Math.PI/2; ring.position.y=.05; g.add(ring);
+  }
+  g.position.set(x,0,z); scene.add(g);
+  return g;
+}
+player=human(0,20,true);
+
+for(let i=0;i<60;i++){
+  let x=(Math.random()*280)-140,z=(Math.random()*280)-140;
+  if(Math.abs(x)<8 && Math.abs(z-20)<8){i--;continue}
+  const g=human(x,z,false);
+  people.push({g,health:60+Math.random()*40,hunger:Math.random()*30,home:houses[i%houses.length]});
+}
+
+function makeCar(x,z,color=0x1c6bd1){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(4.4,1.1,2.2),mat(color));
+  body.position.y=1.05; body.castShadow=true; g.add(body);
+  const cabin=new THREE.Mesh(new THREE.BoxGeometry(2.5,1,1.8),mat(0x263746));
+  cabin.position.set(-.2,1.9,0); cabin.castShadow=true; g.add(cabin);
+  for(const dx of [-1.55,1.55]) for(const dz of [-1.05,1.05]){
+    const w=new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,.28,16),mat(0x16191d));
+    w.rotation.z=Math.PI/2; w.position.set(dx,.55,dz); g.add(w);
+  }
+  g.position.set(x,0,z); scene.add(g);
+  return g;
+}
+for(let i=0;i<14;i++){
+  const c=makeCar((Math.random()*250)-125,(Math.random()*250)-125,[0x1c6bd1,0xd83c3c,0xffffff,0x222222,0xf0b323][i%5]);
+  cars.push({g:c,angle:Math.random()*Math.PI*2,speed:.02+Math.random()*.025});
+}
+
+function makeAnimal(x,z){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.SphereGeometry(.8,14,10),mat(0x9b704c));
+  body.scale.set(1.35,.8,.8); body.position.y=1; body.castShadow=true; g.add(body);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.5,14,10),mat(0xb8875e));
+  head.position.set(1,1.35,0); head.castShadow=true; g.add(head);
+  for(const dx of [-.55,.55]) for(const dz of [-.42,.42]){
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.8,8),mat(0x493426));
+    leg.position.set(dx,.45,dz); g.add(leg);
+  }
+  g.position.set(x,0,z); scene.add(g); return g;
+}
+for(let i=0;i<25;i++){
+  const g=makeAnimal((Math.random()*280)-140,(Math.random()*280)-140);
+  animals.push({g,angle:Math.random()*Math.PI*2,speed:.01+Math.random()*.02});
+}
+
+function setText(id,value){document.getElementById(id).textContent=value}
+function msg(t){
+  const el=document.getElementById("msg"); el.textContent=t; el.style.display="block";
+  setTimeout(()=>el.style.display="none",1800);
+}
+function updateHUD(){
+  setText("health",Math.max(0,Math.round(playerHealth)));
+  setText("food",food); setText("water",water);
+  setText("people",people.length+1); setText("houses",houses.length);
+  setText("cars",cars.length); setText("animals",animals.length);
+  const s=document.getElementById("status");
+  s.textContent=inCar?"Estas conduciendo":"Listo para explorar";
+  s.className=playerHealth<40?"bad":playerHealth<70?"warn":"good";
+}
+updateHUD();
+
+function nearest(list,maxDist=8){
+  let best=null,bd=maxDist;
+  for(const o of list){
+    const d=player.position.distanceTo(o.g.position);
+    if(d<bd){bd=d;best=o}
+  }
+  return best;
+}
+
+document.getElementById("heal").onclick=()=>{
+  const p=nearest(people,9);
+  if(!p){msg("Acercate a un habitante");return}
+  if(food<=0){msg("Necesitas recursos");return}
+  p.health=Math.min(100,p.health+25); food--; msg("Habitante sanado"); updateHUD();
+};
+document.getElementById("give").onclick=()=>{
+  const p=nearest(people,9);
+  if(!p){msg("Acercate a un habitante");return}
+  if(food<=0){msg("No tienes comida");return}
+  p.hunger=Math.max(0,p.hunger-50); food--; msg("Comida entregada"); updateHUD();
+};
+document.getElementById("enterCar").onclick=()=>{
+  if(inCar)return;
+  const c=nearest(cars,5);
+  if(!c){msg("Acercate a un auto");return}
+  inCar=true; player.visible=false; player.position.copy(c.g.position); msg("Subiste al auto"); updateHUD();
+};
+document.getElementById("exitCar").onclick=()=>{
+  if(!inCar){msg("No estas en un auto");return}
+  inCar=false; player.visible=true; player.position.x+=2.5; msg("Bajaste del auto"); updateHUD();
+};
+document.getElementById("day").onclick=()=>{
+  night=!night;
+  if(night){
+    scene.background.set(0x07111f); scene.fog.color.set(0x07111f);
+    sun.intensity=.25; hemi.intensity=.45;
+  }else{
+    scene.background.set(0x87ceeb); scene.fog.color.set(0x87ceeb);
+    sun.intensity=2.7; hemi.intensity=2.2;
+  }
+};
+document.getElementById("reset").onclick=()=>{
+  player.position.set(0,0,20); yaw=0; pitch=.18; inCar=false; player.visible=true;
+  playerHealth=100; food=10; water=10; updateHUD(); msg("Mundo reiniciado");
+};
+document.getElementById("help").onclick=()=>{
+  msg("Joystick: caminar. Arrastra el lado derecho: mover camara. RUN: correr. Acercate a personas para ayudarlas.");
+};
+
+function setJoystick(e){
+  const r=document.getElementById("joystick").getBoundingClientRect();
+  let x=e.clientX-r.left-r.width/2, y=e.clientY-r.top-r.height/2;
+  const max=52, d=Math.hypot(x,y);
+  if(d>max){x=x/d*max;y=y/d*max}
+  joyX=x/max; joyY=y/max;
+  document.getElementById("stick").style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;
+}
+const joy=document.getElementById("joystick");
+joy.addEventListener("pointerdown",e=>{joyActive=true;joy.setPointerCapture(e.pointerId);setJoystick(e)});
+joy.addEventListener("pointermove",e=>{if(joyActive)setJoystick(e)});
+joy.addEventListener("pointerup",()=>{joyActive=false;joyX=joyY=0;document.getElementById("stick").style.transform="translate(-50%,-50%)"});
+joy.addEventListener("pointercancel",()=>{joyActive=false;joyX=joyY=0;document.getElementById("stick").style.transform="translate(-50%,-50%)"});
+
+const hint=document.getElementById("cameraHint");
+hint.addEventListener("pointerdown",e=>{camTouch={x:e.clientX,y:e.clientY};hint.setPointerCapture(e.pointerId)});
+hint.addEventListener("pointermove",e=>{
+  if(!camTouch)return;
+  yaw-=(e.clientX-camTouch.x)*.008;
+  pitch-= (e.clientY-camTouch.y)*.004;
+  pitch=Math.max(-.05,Math.min(.65,pitch));
+  camTouch={x:e.clientX,y:e.clientY};
 });
-renderer.domElement.addEventListener("pointerup",()=>dragging=false);
+hint.addEventListener("pointerup",()=>camTouch=null);
+hint.addEventListener("pointercancel",()=>camTouch=null);
 
-const joy=document.getElementById("joy"),stick=document.getElementById("stick");
-function setJoy(e){
- const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
- let dx=e.clientX-cx,dy=e.clientY-cy,max=48,d=Math.hypot(dx,dy);
- if(d>max){dx=dx/d*max;dy=dy/d*max}
- joyX=dx/max;joyY=dy/max;
- stick.style.transform=`translate(${dx}px,${dy}px)`;
-}
-function resetJoy(){joyX=joyY=0;stick.style.transform="translate(0,0)"}
-joy.addEventListener("pointerdown",e=>{joy.setPointerCapture(e.pointerId);setJoy(e)});
-joy.addEventListener("pointermove",e=>setJoy(e));
-joy.addEventListener("pointerup",resetJoy);
-joy.addEventListener("pointercancel",resetJoy);
 document.getElementById("run").addEventListener("pointerdown",()=>running=true);
 document.getElementById("run").addEventListener("pointerup",()=>running=false);
 document.getElementById("run").addEventListener("pointercancel",()=>running=false);
 
-document.getElementById("help").onclick=()=>show("ð® Joystick izquierdo: caminar. ð MantÃ©n presionado para correr. Arrastra sobre la pantalla para girar la cÃ¡mara.");
+addEventListener("keydown",e=>{keys[e.key.toLowerCase()]=true});
+addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false});
 
-function show(t){
- const m=document.getElementById("msg");m.textContent=t;m.style.display="block";
- setTimeout(()=>m.style.display="none",3000);
+function movement(dt){
+  let x=joyX,y=joyY;
+  if(keys.w||keys.arrowup)y=-1;
+  if(keys.s||keys.arrowdown)y=1;
+  if(keys.a||keys.arrowleft)x=-1;
+  if(keys.d||keys.arrowright)x=1;
+  if(Math.abs(x)+Math.abs(y)<.01)return;
+  const speed=(running?12:6)*dt;
+  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+  const dir=new THREE.Vector3().addScaledVector(forward,-y).addScaledVector(right,x);
+  if(dir.lengthSq()>0)dir.normalize();
+  const target=inCar?cars.find(c=>Math.abs(c.g.position.x-player.position.x)<.1 && Math.abs(c.g.position.z-player.position.z)<.1):null;
+  if(inCar){
+    const c=nearest(cars,1);
+    if(c){c.g.position.addScaledVector(dir,speed*1.8);c.g.rotation.y=Math.atan2(dir.x,dir.z);player.position.copy(c.g.position)}
+  }else{
+    player.position.addScaledVector(dir,speed);
+    player.rotation.y=Math.atan2(dir.x,dir.z);
+  }
 }
 
-function animate(){
- requestAnimationFrame(animate);
- const dt=clock.getDelta();
- day+=dt;
- move();
-
- people.forEach((p,i)=>{
-   const t=day*.25+i;
-   p.position.x+=Math.sin(t)*.004;
-   p.position.z+=Math.cos(t)*.004;
- });
- cars.forEach((c,i)=>{
-   c.position.x+=((i%2)?1:-1)*dt*1.4;
-   if(c.position.x>130)c.position.x=-130;
-   if(c.position.x<-130)c.position.x=130;
- });
- animals.forEach((a,i)=>{
-   a.rotation.y+=Math.sin(day+i)*.001;
- });
- updateCamera();
- renderer.render(scene,camera);
+function updateCamera(){
+  const target=inCar?player.position.clone().add(new THREE.Vector3(0,1.4,0)):player.position.clone().add(new THREE.Vector3(0,1.5,0));
+  const dist=inCar?11:8;
+  const offset=new THREE.Vector3(
+    Math.sin(yaw)*dist,
+    3.2+pitch*4,
+    Math.cos(yaw)*dist
+  );
+  camera.position.lerp(target.clone().add(offset),.14);
+  camera.lookAt(target);
 }
-animate();
 
-document.getElementById("people").textContent=people.length;
-document.getElementById("houses").textContent=document.querySelectorAll("body").length?Math.floor(221/1):0;
-document.getElementById("cars").textContent=cars.length;
-document.getElementById("animals").textContent=animals.length;
+function animatePeople(dt){
+  for(const p of people){
+    p.hunger+=dt*1.2;
+    if(p.hunger>75)p.health-=dt*1.5;
+    p.health=Math.max(0,Math.min(100,p.health));
+    const walk=Math.sin(clock.elapsedTime*.8+p.g.position.x)*.35;
+    p.g.rotation.y+=Math.sin(clock.elapsedTime*.25+p.g.position.z)*dt*.2;
+    p.g.position.x+=Math.cos(clock.elapsedTime*.12+p.g.position.x)*dt*.35;
+    p.g.position.z+=Math.sin(clock.elapsedTime*.15+p.g.position.z)*dt*.35;
+  }
+}
+function animateAnimals(dt){
+  for(const a of animals){
+    a.g.position.x+=Math.cos(a.angle)*a.speed*60*dt;
+    a.g.position.z+=Math.sin(a.angle)*a.speed*60*dt;
+    a.g.rotation.y=a.angle;
+    if(Math.abs(a.g.position.x)>185||Math.abs(a.g.position.z)>185)a.angle+=Math.PI;
+    if(Math.random()<.004)a.angle+=(Math.random()-.5)*1.5;
+  }
+}
+function animateCars(dt){
+  for(const c of cars){
+    if(inCar && c.g.position.distanceTo(player.position)<1)return;
+    c.g.position.x+=Math.cos(c.angle)*c.speed*60*dt;
+    c.g.position.z+=Math.sin(c.angle)*c.speed*60*dt;
+    c.g.rotation.y=-c.angle;
+    if(Math.abs(c.g.position.x)>190||Math.abs(c.g.position.z)>190)c.angle+=Math.PI;
+  }
+}
+
+function loop(){
+  requestAnimationFrame(loop);
+  const dt=Math.min(clock.getDelta(),.04);
+  movement(dt);
+  animatePeople(dt);
+  animateAnimals(dt);
+  animateCars(dt);
+  water=Math.max(0,water-dt*.035);
+  if(water<1)playerHealth-=dt*.3;
+  updateCamera();
+  updateHUD();
+  renderer.render(scene,camera);
+}
+loop();
 
 addEventListener("resize",()=>{
- camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
 });
+
+// ==================== SONIDO AMBIENTAL DE CIUDAD ====================
+let audioCtx = null, masterGain = null, cityGain = null, windGain = null;
+let soundOn = false, ambienceTimer = null;
+
+function noiseBuffer(ctx, seconds){
+  const b = ctx.createBuffer(1, Math.floor(ctx.sampleRate*seconds), ctx.sampleRate);
+  const d = b.getChannelData(0);
+  let last = 0;
+  for(let i=0;i<d.length;i++){
+    last = last*0.98 + (Math.random()*2-1)*0.18;
+    d[i] = last;
+  }
+  return b;
+}
+
+function startCitySound(){
+  if(soundOn) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.22;
+  masterGain.connect(audioCtx.destination);
+
+  // Ruido lejano de trÃ¡fico.
+  const traffic = audioCtx.createBufferSource();
+  traffic.buffer = noiseBuffer(audioCtx, 3);
+  traffic.loop = true;
+  const trafficFilter = audioCtx.createBiquadFilter();
+  trafficFilter.type = "lowpass";
+  trafficFilter.frequency.value = 520;
+  cityGain = audioCtx.createGain();
+  cityGain.gain.value = 0.20;
+  traffic.connect(trafficFilter).connect(cityGain).connect(masterGain);
+  traffic.start();
+
+  // Viento suave.
+  const wind = audioCtx.createBufferSource();
+  wind.buffer = noiseBuffer(audioCtx, 4);
+  wind.loop = true;
+  const windFilter = audioCtx.createBiquadFilter();
+  windFilter.type = "lowpass";
+  windFilter.frequency.value = 900;
+  windGain = audioCtx.createGain();
+  windGain.gain.value = 0.10;
+  wind.connect(windFilter).connect(windGain).connect(masterGain);
+  wind.start();
+
+  soundOn = true;
+  const btn = document.getElementById("sound");
+  if(btn){ btn.textContent="ð Silenciar"; btn.classList.add("soundOn"); }
+
+  // Eventos ocasionales: claxon, pÃ¡jaros y campanilla urbana.
+  ambienceTimer = setInterval(citySoundEvent, 3500);
+  showMsg && showMsg("ð Ambiente de ciudad activado");
+}
+
+function tone(freq, duration, type="sine", volume=0.035){
+  if(!audioCtx || !soundOn) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(volume, audioCtx.currentTime+0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+duration);
+  o.connect(g).connect(masterGain);
+  o.start();
+  o.stop(audioCtx.currentTime+duration+0.05);
+}
+
+function citySoundEvent(){
+  if(!soundOn) return;
+  const r=Math.random();
+  if(r<0.45){
+    // Claxon lejano.
+    tone(180,0.18,"square",0.025);
+    setTimeout(()=>tone(220,0.12,"square",0.018),180);
+  }else if(r<0.75){
+    // PÃ¡jaros.
+    tone(1500,0.10,"sine",0.018);
+    setTimeout(()=>tone(1900,0.08,"sine",0.018),120);
+    setTimeout(()=>tone(2300,0.07,"sine",0.014),220);
+  }else{
+    // Sonido urbano corto.
+    tone(420,0.10,"triangle",0.015);
+    setTimeout(()=>tone(520,0.08,"triangle",0.012),100);
+  }
+}
+
+function stopCitySound(){
+  if(!soundOn) return;
+  clearInterval(ambienceTimer);
+  ambienceTimer=null;
+  if(audioCtx){
+    audioCtx.close();
+    audioCtx=null;
+  }
+  soundOn=false;
+  const btn=document.getElementById("sound");
+  if(btn){ btn.textContent="ð Sonido"; btn.classList.remove("soundOn"); }
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const btn=document.getElementById("sound");
+  if(btn){
+    btn.addEventListener("click",()=>{
+      soundOn ? stopCitySound() : startCitySound();
+    });
+  }
+});
+
+
+// ==================== PERSONALIZACION DEL PERSONAJE ====================
+const customPanel=document.getElementById("customPanel");
+document.getElementById("custom").onclick=()=>{
+  customPanel.style.display=customPanel.style.display==="block"?"none":"block";
+};
+document.getElementById("closeCustom").onclick=()=>customPanel.style.display="none";
+
+const skinColors=[0xb9794f,0xf0c3a0,0xd7a67c];
+const hairColors={negro:0x171717,castano:0x5a3826,rubio:0xd5a33a,pelirrojo:0x9b482e};
+
+function applyCustomization(){
+  const shirt=parseInt(document.getElementById("cShirt").value.slice(1),16);
+  const pants=parseInt(document.getElementById("cPants").value.slice(1),16);
+  const skin=skinColors[parseInt(document.getElementById("cSkin").value)];
+  const hair=hairColors[document.getElementById("cHair").value];
+  const height=parseFloat(document.getElementById("cHeight").value);
+  const sex=document.getElementById("cSex").value;
+
+  // Player is a group: head, body, legs, ring.
+  const head=player.children[0];
+  const body=player.children[1];
+  const leg1=player.children[2];
+  const leg2=player.children[3];
+
+  head.material.color.setHex(skin);
+  body.material.color.setHex(shirt);
+  leg1.material.color.setHex(pants);
+  leg2.material.color.setHex(pants);
+
+  // Remove old hair if present.
+  const oldHair=player.getObjectByName("playerHair");
+  if(oldHair) player.remove(oldHair);
+
+  const hairMesh=new THREE.Mesh(
+    new THREE.SphereGeometry(.62,18,10,0,Math.PI*2,0,Math.PI*.48),
+    mat(hair)
+  );
+  hairMesh.name="playerHair";
+  hairMesh.position.y=3.45;
+  hairMesh.scale.z=.95;
+  player.add(hairMesh);
+
+  // Slightly different proportions.
+  body.scale.set(sex==="mujer"?.88:1,sex==="mujer"?1.02:1,1);
+  player.scale.set(1,height,1);
+
+  msg("Personaje personalizado");
+  customPanel.style.display="none";
+}
+document.getElementById("applyCustom").onclick=applyCustomization;
+
 </script>
 </body>
 </html>
